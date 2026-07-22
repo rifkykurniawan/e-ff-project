@@ -4,21 +4,19 @@ This document maps out the implementation plan for the **Family Finance** projec
 
 ---
 
-## Milestone 1: Workspace Initialization & Core Authentication
-*   **Objective**: Setup backend/frontend project templates, design database migration pipelines, and deploy JWT authentication.
+## Milestone 1: Workspace Initialization & Core Authentication (Supabase Migration)
+*   **Objective**: Setup frontend project template, configure Supabase client, and integrate Supabase Auth.
 *   **Dependencies**: None.
 *   **Estimated Complexity**: Medium
 *   **Tasks**:
-    1.  **Backend Setup**: Initialize FastAPI with SQLAlchemy 2, Pydantic v2, Alembic migration environment, and PostgreSQL connection.
-    2.  **User Model**: Create the database model for the `User` entity and generate initial Alembic migration.
-    3.  **Auth Service**: Implement secure password hashing, verification, and JWT token issue/validation services.
-    4.  **Auth Routers**: Build API endpoints for login (`POST /api/v1/auth/login`) and session verification (`GET /api/v1/auth/me`).
-    5.  **Frontend Bootstrap**: Spin up React SPA with TypeScript, Vite, Tailwind CSS, shadcn/ui, and React Router.
-    6.  **Auth UI**: Build login forms using React Hook Form + Zod, and configure TanStack Query state hydration for token validation.
+    1.  **Supabase Client Setup**: Install `@supabase/supabase-js` and configure environment variables in React Vite app.
+    2.  **Supabase Client Initialization**: Initialize Supabase client in `src/services/supabaseClient.ts`.
+    3.  **Auth Service Integration**: Refactor login and session hook to use Supabase Auth client instead of custom REST API endpoints.
+    4.  **Auth UI Integration**: Update login form logic (React Hook Form + Zod) to perform login through Supabase.
 *   **Definition of Done**:
-    *   API runs locally and successfully handles credential checks.
-    *   Frontend blocks navigation to dashboard routes and successfully redirects to a login screen.
-    *   Entering correct user credentials issues a valid JWT and logs the user in.
+    *   Supabase environment variables are defined.
+    *   Frontend blocks navigation to dashboard routes and successfully redirects to a login screen when unauthenticated.
+    *   Entering correct credentials in Supabase Auth logs the user in and establishes a session.
 
 ---
 

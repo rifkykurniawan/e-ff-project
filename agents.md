@@ -33,75 +33,53 @@ Build a modern finance management application that allows family members to:
 
 # Tech Stack
 
-## Frontend
+## Frontend & Backend (Serverless BaaS)
 
-- React
+- React (Vite)
 - TypeScript
-- Vite
 - Tailwind CSS
 - shadcn/ui
 - React Router
 - TanStack Query
 - React Hook Form
 - Zod
-- Axios
+- Supabase JS SDK (`@supabase/supabase-js`)
 
-## Backend
+## Database & Authentication
 
-- FastAPI
-- Python 3.13+
-- SQLAlchemy 2
-- Alembic
-- PostgreSQL
-- Pydantic v2
-
-## Authentication
-
-- JWT Authentication
+- Supabase Database (PostgreSQL)
+- Supabase Auth (GoTrue)
+- Supabase Row Level Security (RLS)
 
 ## Deployment
 
 Frontend
 - Vercel
 
-Backend
-- Railway (preferred)
-
-Database
-- PostgreSQL
+Backend/Database
+- Supabase
 
 ---
 
 # Architecture
 
-Always follow Clean Architecture.
+Since this is a Serverless BaaS architecture using Supabase, we do not have a dedicated backend application.
 
-Business Logic must never exist inside API routes.
+Database access rules and security are enforced at the database level using Row Level Security (RLS) policies.
 
-Use the following layers.
-
-Backend
+Use the following structure for data access:
 
 ```
-routers
-    ↓
-
-services
-    ↓
-
-repositories
-    ↓
-
-database
+UI Pages / Components
+         ↓
+    React Hooks (Mutations / Queries)
+         ↓
+  Supabase Services / Queries (supabaseClient)
+         ↓
+   Supabase Database / Auth
 ```
 
-Never access SQLAlchemy models directly from routers.
-
-Repositories communicate with database.
-
-Services contain business rules.
-
-Routers only validate request and return response.
+Always perform user authorization checks and data security policies in Supabase RLS.
 
 ---
 
@@ -124,9 +102,9 @@ pages/
 
 routes/
 
-services/
+services/   # Contains Supabase query services and client initialization
 
-types/
+types/      # TypeScript interfaces/types matching database schemas
 
 utils/
 
@@ -136,34 +114,6 @@ assets/
 ```
 
 Organize code by feature whenever possible.
-
----
-
-## Backend
-
-```
-app/
-
-routers/
-
-services/
-
-repositories/
-
-models/
-
-schemas/
-
-database/
-
-core/
-
-middlewares/
-
-utils/
-
-dependencies/
-```
 
 ---
 
@@ -440,146 +390,71 @@ Export support should be designed to allow future PDF and Excel generation.
 
 # API Standards
 
-REST API only.
+Use Supabase client library (`supabase-js`) to query the database and trigger authentication.
 
-Use
-
-GET
-
-POST
-
-PUT
-
-PATCH
-
-DELETE
-
-Always return consistent JSON responses.
-
-Example
-
-```
-{
-  "success": true,
-  "message": "Account created successfully",
-  "data": {}
-}
-```
-
-Errors
-
-```
-{
-  "success": false,
-  "message": "Validation failed",
-  "errors": {}
-}
-```
+Always handle Supabase errors gracefully and structure responses/errors consistently inside the UI.
 
 ---
 
 # Validation
 
-Backend validation is mandatory.
-
-Frontend validation is mandatory.
-
-Never trust frontend input.
+- Frontend validation is mandatory (React Hook Form + Zod).
+- Database-level validation is mandatory (PostgreSQL check constraints, not-null constraints, and triggers).
 
 ---
 
 # Database
 
-Use PostgreSQL.
-
-Use UUID as primary keys unless there is a strong reason otherwise.
-
-Use timestamps
-
-created_at
-
-updated_at
-
-Use soft delete only if necessary.
-
-Always generate Alembic migrations.
+Use Supabase PostgreSQL:
+- Use UUID as primary keys.
+- Use timestamps: `created_at` and `updated_at`.
+- Enable Row Level Security (RLS) on all tables.
+- For migrations, document SQL DDL scripts clearly for the Supabase SQL editor.
 
 ---
 
 # Security
 
-Hash passwords.
-
-Never store plain passwords.
-
-Protect authenticated routes.
-
-Validate JWT.
-
-Never expose sensitive information.
+- Authentication is managed via Supabase Auth.
+- Protect frontend routes by checking the active Supabase session.
+- Secure database tables via Row Level Security (RLS) policies based on the authenticated user ID (`auth.uid()`).
+- Never expose the Supabase Service Role key (secret key) to the frontend. Only use the Anon key.
 
 ---
 
 # Error Handling
 
-Provide meaningful error messages.
-
-Handle
-
-- Validation errors
-- Authentication errors
-- Database errors
-- Business rule errors
+Provide meaningful error messages. Handle:
+- Supabase API errors
+- Form validation errors
+- Constraint violation errors
 
 ---
 
 # Logging
 
-Use structured logging.
-
-Log
-
-- Startup
-- Login
-- Errors
-- Critical operations
-
-Do not log passwords.
-
-Do not log tokens.
+Use frontend console logging for debugging, ensuring no sensitive data (passwords, JWT tokens) is printed.
 
 ---
 
 # Testing
 
 Every feature should include:
-
 - Manual testing checklist
-- API testing checklist
 - Edge cases
-
-Generate unit tests only when requested.
 
 ---
 
 # Development Workflow
 
-Always build one feature at a time.
-
-For every feature, follow this order:
-
-1. Database Model
-2. Migration
-3. Schema
-4. Repository
-5. Service
-6. API
-7. Frontend API
-8. React Hook
-9. Form
-10. UI
-11. Validation
-12. Manual Testing Checklist
+Always build one feature at a time. For every feature, follow this order:
+1. Supabase Database Schema (Table definition SQL)
+2. Row Level Security (RLS) Policies
+3. Supabase Frontend Services
+4. React Hook (TanStack Query)
+5. Form and UI Component
+6. Frontend Schema Validation (Zod)
+7. Manual Testing Checklist
 
 Never start another feature before the current one is complete.
 

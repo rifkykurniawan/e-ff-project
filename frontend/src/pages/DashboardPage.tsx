@@ -110,7 +110,7 @@ export const DashboardPage: React.FC = () => {
           <div className="bg-emerald-500/10 p-2 rounded-lg">
             <Wallet className="h-5 w-5" />
           </div>
-          <span className="font-bold text-lg text-zinc-900 dark:text-white tracking-tight">Family Finance</span>
+          <span className="font-bold text-lg text-zinc-900 dark:text-white tracking-tight">Finance</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex flex-col text-right">
@@ -149,7 +149,7 @@ export const DashboardPage: React.FC = () => {
               Halo, {user?.first_name || "Keluarga"} 👋
             </h1>
             <p className="text-zinc-500 dark:text-zinc-400 text-sm sm:text-base">
-              Berikut adalah ringkasan keuangan keluarga Anda bulan ini.
+              Berikut adalah ringkasan keuangan Anda bulan ini.
             </p>
           </div>
           <div className="flex gap-2">

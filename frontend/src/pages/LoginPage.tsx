@@ -84,7 +84,7 @@ export const LoginPage: React.FC = () => {
                 className={`mt-1 block w-full rounded-lg border bg-zinc-50 dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
                   errors.email ? "border-red-500" : "border-zinc-200 dark:border-zinc-800"
                 }`}
-                placeholder="anda@contoh.com"
+                placeholder="example@mail.com"
               />
               {errors.email && (
                 <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>

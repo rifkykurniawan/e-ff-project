@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, type ReactNode } from "react";
 import type { UserResponse, LoginCredentials } from "../types/auth";
 import { authService } from "../services/authService";
+import { supabase } from "../services/supabaseClient";
 
 interface AuthContextType {
   user: UserResponse | null;
@@ -16,27 +17,46 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Initialize and check for existing session
+  // Initialize and listen for Supabase auth state changes
   useEffect(() => {
     const initializeAuth = async () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const response = await authService.getMe();
-          if (response.success) {
-            setUser(response.data);
-          } else {
-            localStorage.removeItem("token");
-          }
-        } catch (error) {
-          console.error("Session restoration failed:", error);
-          localStorage.removeItem("token");
+      try {
+        const response = await authService.getMe();
+        if (response.success && response.data) {
+          setUser(response.data);
+        } else {
+          setUser(null);
         }
+      } catch (error) {
+        console.error("Session restoration failed:", error);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     initializeAuth();
+
+    // Listen for dynamic auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (session && session.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || "",
+            first_name: session.user.user_metadata?.first_name || "Keluarga",
+            last_name: session.user.user_metadata?.last_name || "",
+          });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
@@ -44,23 +64,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await authService.login(credentials);
       if (response.success && response.data) {
-        localStorage.setItem("token", response.data.access_token);
         setUser(response.data.user);
       } else {
         throw new Error(response.message || "Login failed");
       }
     } catch (error) {
       setUser(null);
-      localStorage.removeItem("token");
       throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
+  const logout = async () => {
+    setLoading(true);
+    try {
+      await authService.logout();
+      setUser(null);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const value: AuthContextType = {
