@@ -80,18 +80,24 @@ erDiagram
 
 ## 2. Table Specifications
 
-### 2.1. `users` Table
-Stores authenticated family members. All users have equal read/write permissions.
+### 2.1. `users` Table (Supabase `auth.users` / Public Profile)
+Stores authenticated family members. In Supabase, the core authentication is handled by the built-in `auth.users` schema. We store additional metadata (like first and last names) in the `user_metadata` JSONB column of `auth.users`, or in a separate `public.profiles` table if complex relations are needed.
 
-| Column Name | Data Type | Constraints | Description |
+| Column Name (Logical) | Data Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
-| `id` | `UUID` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | Unique identifier for each family member. |
+| `id` | `UUID` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | Unique identifier for each family member (maps to `auth.users.id`). |
 | `email` | `VARCHAR(255)` | `UNIQUE`, `NOT NULL` | Login email identifier. |
-| `hashed_password` | `VARCHAR(255)` | `NOT NULL` | Argon2/Bcrypt hashed password. |
-| `first_name` | `VARCHAR(100)` | `NOT NULL` | First name. |
-| `last_name` | `VARCHAR(100)` | `NOT NULL` | Last name. |
+| `user_metadata` | `JSONB` | `NULL` | Stores `first_name` and `last_name`. |
 | `created_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Timestamp when user was created. |
 | `updated_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Timestamp when user was last updated. |
+
+---
+
+### Row Level Security (RLS)
+Since we are using Supabase directly from the frontend, **Row Level Security (RLS)** is mandatory.
+- All tables must have RLS enabled: `ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;`
+- A general policy for this single-family application is to allow access to all authenticated users:
+  `CREATE POLICY "Allow full access to authenticated users" ON table_name FOR ALL USING (auth.role() = 'authenticated');`
 
 ---
 
