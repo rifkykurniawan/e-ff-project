@@ -47,6 +47,7 @@ export const LoginPage: React.FC = () => {
         onClick={toggleTheme}
         className="absolute top-4 right-4 p-2.5 rounded-xl bg-white hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 transition-all text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 shadow-sm"
         title="Toggle Theme"
+        data-testid="theme-toggle-button"
       >
         {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
       </button>
@@ -81,6 +82,7 @@ export const LoginPage: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 {...register("email")}
+                data-testid="login-email-input"
                 className={`mt-1 block w-full rounded-lg border bg-zinc-50 dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
                   errors.email ? "border-red-500" : "border-zinc-200 dark:border-zinc-800"
                 }`}
@@ -100,6 +102,7 @@ export const LoginPage: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 {...register("password")}
+                data-testid="login-password-input"
                 className={`mt-1 block w-full rounded-lg border bg-zinc-50 dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
                   errors.password ? "border-red-500" : "border-zinc-200 dark:border-zinc-800"
                 }`}
@@ -115,6 +118,7 @@ export const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
+              data-testid="login-submit-button"
               className="group relative flex w-full justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-zinc-900 disabled:opacity-50"
             >
               {isSubmitting ? (

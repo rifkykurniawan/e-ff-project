@@ -26,6 +26,12 @@ export const authService = {
         };
       }
 
+      const { data: profile } = await supabase
+        .from("users")
+        .select("first_name, last_name")
+        .eq("id", data.user.id)
+        .single();
+
       return {
         success: true,
         message: "Login successful",
@@ -35,8 +41,8 @@ export const authService = {
           user: {
             id: data.user.id,
             email: data.user.email || "",
-            first_name: data.user.user_metadata?.first_name || "Keluarga",
-            last_name: data.user.user_metadata?.last_name || "",
+            first_name: profile?.first_name || data.user.user_metadata?.first_name || "Keluarga",
+            last_name: profile?.last_name || data.user.user_metadata?.last_name || "",
           },
         },
       };
@@ -69,14 +75,21 @@ export const authService = {
       }
 
       const user = data.session.user;
+      
+      const { data: profile } = await supabase
+        .from("users")
+        .select("first_name, last_name")
+        .eq("id", user.id)
+        .single();
+
       return {
         success: true,
         message: "Session retrieved successfully",
         data: {
           id: user.id,
           email: user.email || "",
-          first_name: user.user_metadata?.first_name || "Keluarga",
-          last_name: user.user_metadata?.last_name || "",
+          first_name: profile?.first_name || user.user_metadata?.first_name || "Keluarga",
+          last_name: profile?.last_name || user.user_metadata?.last_name || "",
         },
       };
     } catch (err: any) {

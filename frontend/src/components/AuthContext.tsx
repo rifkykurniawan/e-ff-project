@@ -41,11 +41,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (session && session.user) {
+          // Coba ambil dari tabel 'users' (atau sesuaikan dengan nama tabel Anda)
+          const { data: profile } = await supabase
+            .from("users")
+            .select("first_name, last_name")
+            .eq("id", session.user.id)
+            .single();
+
           setUser({
             id: session.user.id,
             email: session.user.email || "",
-            first_name: session.user.user_metadata?.first_name || "Keluarga",
-            last_name: session.user.user_metadata?.last_name || "",
+            first_name: profile?.first_name || session.user.user_metadata?.first_name || "Keluarga",
+            last_name: profile?.last_name || session.user.user_metadata?.last_name || "",
           });
         } else {
           setUser(null);

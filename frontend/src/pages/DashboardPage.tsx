@@ -110,7 +110,7 @@ export const DashboardPage: React.FC = () => {
           <div className="bg-emerald-500/10 p-2 rounded-lg">
             <Wallet className="h-5 w-5" />
           </div>
-          <span className="font-bold text-lg text-zinc-900 dark:text-white tracking-tight">Finance</span>
+          <span className="font-bold text-lg text-zinc-900 dark:text-white tracking-tight"> Finance</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex flex-col text-right">
@@ -125,6 +125,7 @@ export const DashboardPage: React.FC = () => {
             onClick={toggleTheme}
             className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-600 dark:text-zinc-300 transition-colors border border-zinc-200 dark:border-zinc-700"
             title="Ubah Tema"
+            data-testid="theme-toggle-button"
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
@@ -132,6 +133,7 @@ export const DashboardPage: React.FC = () => {
           <button
             onClick={handleLogout}
             className="flex items-center gap-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 px-3 py-1.5 text-sm font-medium transition-colors text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-700"
+            data-testid="logout-button"
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Keluar</span>
@@ -156,12 +158,14 @@ export const DashboardPage: React.FC = () => {
             <button
               onClick={() => setActiveModal("income")}
               className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition-all shadow-md shadow-emerald-950/20 active:scale-95 cursor-pointer"
+              data-testid="hero-income-button"
             >
               <Plus className="h-4 w-4" /> Catat Pendapatan
             </button>
             <button
               onClick={() => setActiveModal("expense")}
               className="flex items-center gap-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-250 dark:bg-zinc-800 dark:hover:bg-zinc-700 px-4 py-2.5 text-sm font-semibold text-zinc-700 dark:text-white transition-all active:scale-95 border border-zinc-200 dark:border-zinc-700 cursor-pointer"
+              data-testid="hero-expense-button"
             >
               <Minus className="h-4 w-4" /> Catat Pengeluaran
             </button>
@@ -509,6 +513,7 @@ export const DashboardPage: React.FC = () => {
                 <button
                   onClick={() => setActiveModal("income")}
                   className="flex items-center gap-3 w-full rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-3.5 text-sm font-medium transition-all text-left text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700/80 active:scale-[0.99] cursor-pointer"
+                  data-testid="quick-action-income"
                 >
                   <div className="bg-emerald-500/10 p-2 rounded-lg text-emerald-600 dark:text-emerald-500">
                     <Plus className="h-4 w-4" />
@@ -522,6 +527,7 @@ export const DashboardPage: React.FC = () => {
                 <button
                   onClick={() => setActiveModal("expense")}
                   className="flex items-center gap-3 w-full rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-3.5 text-sm font-medium transition-all text-left text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700/80 active:scale-[0.99] cursor-pointer"
+                  data-testid="quick-action-expense"
                 >
                   <div className="bg-rose-500/10 p-2 rounded-lg text-rose-600 dark:text-rose-500">
                     <Minus className="h-4 w-4" />
@@ -535,6 +541,7 @@ export const DashboardPage: React.FC = () => {
                 <button
                   onClick={() => setActiveModal("transfer")}
                   className="flex items-center gap-3 w-full rounded-xl bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800 p-3.5 text-sm font-medium transition-all text-left text-zinc-700 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700/80 active:scale-[0.99] cursor-pointer"
+                  data-testid="quick-action-transfer"
                 >
                   <div className="bg-blue-500/10 p-2 rounded-lg text-blue-600 dark:text-blue-500">
                     <ArrowLeftRight className="h-4 w-4" />
@@ -564,6 +571,7 @@ export const DashboardPage: React.FC = () => {
               <button
                 onClick={() => setActiveModal(null)}
                 className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer"
+                data-testid="modal-close-icon"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -581,6 +589,7 @@ export const DashboardPage: React.FC = () => {
               <button
                 onClick={() => setActiveModal(null)}
                 className="w-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-sm text-zinc-800 dark:text-white font-semibold py-2.5 rounded-xl transition-all border border-zinc-200 dark:border-zinc-700/60 cursor-pointer"
+                data-testid="modal-close-button"
               >
                 Tutup
               </button>
