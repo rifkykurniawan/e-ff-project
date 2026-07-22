@@ -1,6 +1,9 @@
+# pyrefly: ignore [missing-import]
 from fastapi import FastAPI
+# pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.routers import auth_router
 
 app = FastAPI(
     title="Family Finance API",
@@ -17,6 +20,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include routers
+app.include_router(auth_router.router, prefix=settings.API_V1_STR)
+
 @app.get("/health", tags=["Health"])
 async def health_check():
     return {
@@ -30,3 +36,4 @@ async def root():
     return {
         "message": "Welcome to Family Finance API. Go to /docs for API documentation."
     }
+

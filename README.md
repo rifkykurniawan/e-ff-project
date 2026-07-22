@@ -73,7 +73,66 @@ Copy the example environment file:
 cp .env.example .env
 ```
 
-### 3. Run with Docker Compose
+### 3. Local Development Setup (Manual)
+
+If you prefer to run services natively (without Docker), follow these steps:
+
+#### A. Database Configuration
+1. Make sure your local PostgreSQL server is running.
+2. Create the target database:
+   ```bash
+   createdb family_finance
+   # Or using psql:
+   psql -d postgres -c "CREATE DATABASE family_finance;"
+   ```
+3. Copy configuration settings:
+   ```bash
+   cp .env.example .env
+   cp .env.example backend/.env
+   ```
+4. Adjust `DATABASE_URL` in both `.env` and `backend/.env` with your local PostgreSQL username and password.
+
+#### B. Run Backend API
+1. Navigate to the backend directory and set up a virtual environment:
+   ```bash
+   cd backend
+   python3 -m venv .venv
+   source .venv/bin/activate  # Or .venv\Scripts\activate on Windows
+   ```
+2. Install python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run Alembic migrations to create tables:
+   ```bash
+   alembic upgrade head
+   ```
+4. Run the user seeding script to create the initial user:
+   ```bash
+   python scripts/create_first_user.py
+   ```
+5. Run the FastAPI development server:
+   ```bash
+   uvicorn app.main:app --reload --port 8000
+   ```
+   The backend API will run on http://localhost:8000. Interactive Swagger documentation will be available at http://localhost:8000/docs.
+
+#### C. Run Frontend SPA
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Install npm dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+   The frontend application will be active at http://localhost:5173.
+
+### 4. Run with Docker Compose
 To build and start all services (database, backend, and frontend) in containers:
 ```bash
 docker compose up --build
@@ -81,3 +140,4 @@ docker compose up --build
 - Frontend will be available at: http://localhost:5173
 - Backend API will be available at: http://localhost:8000
 - API Interactive Docs: http://localhost:8000/docs
+
