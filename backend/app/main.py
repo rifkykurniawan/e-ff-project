@@ -3,7 +3,7 @@ from fastapi import FastAPI
 # pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routers import auth_router
+from app.routers import auth_router, reports_router
 
 app = FastAPI(
     title="Family Finance API",
@@ -22,6 +22,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth_router.router, prefix=settings.API_V1_STR)
+app.include_router(reports_router.router, prefix=settings.API_V1_STR)
 
 @app.get("/health", tags=["Health"])
 async def health_check():
