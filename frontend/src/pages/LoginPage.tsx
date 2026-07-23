@@ -8,8 +8,8 @@ import { Wallet, Sun, Moon } from "lucide-react";
 import { useTheme } from "../components/ThemeContext";
 
 const loginSchema = z.object({
-  email: z.string().email("Silakan masukkan alamat email yang valid"),
-  password: z.string().min(8, "Kata sandi harus minimal 8 karakter"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 type LoginFields = z.infer<typeof loginSchema>;
@@ -35,7 +35,7 @@ export const LoginPage: React.FC = () => {
       navigate("/");
     } catch (err: any) {
       setErrorMsg(
-        err.response?.data?.message || err.message || "Email atau kata sandi salah"
+        err.response?.data?.message || err.message || "Invalid email or password"
       );
     }
   };
@@ -61,7 +61,7 @@ export const LoginPage: React.FC = () => {
             Family Finance
           </h2>
           <p className="mt-2 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            Masuk untuk mengelola keuangan keluarga Anda
+            Sign in to manage your family's finances
           </p>
         </div>
 
@@ -75,7 +75,7 @@ export const LoginPage: React.FC = () => {
           <div className="space-y-4 rounded-md">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Alamat Email
+                Email Address
               </label>
               <input
                 id="email"
@@ -95,7 +95,7 @@ export const LoginPage: React.FC = () => {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Kata Sandi
+                Password
               </label>
               <input
                 id="password"
@@ -124,7 +124,7 @@ export const LoginPage: React.FC = () => {
               {isSubmitting ? (
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
               ) : (
-                "Masuk"
+                "Sign In"
               )}
             </button>
           </div>

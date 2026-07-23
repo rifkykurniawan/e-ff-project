@@ -47,7 +47,7 @@ export const DashboardPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white flex flex-col justify-center items-center gap-4 transition-colors duration-200">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
-        <p className="text-zinc-500 dark:text-zinc-400 font-medium">Memuat dasbor keluarga...</p>
+        <p className="text-zinc-500 dark:text-zinc-400 font-medium">Loading family dashboard...</p>
       </div>
     );
   }
@@ -56,15 +56,15 @@ export const DashboardPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white flex flex-col justify-center items-center gap-4 transition-colors duration-200">
         <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-center max-w-md">
-          <p className="text-red-400 font-semibold mb-2">Gagal Memuat Dasbor</p>
+          <p className="text-red-400 font-semibold mb-2">Failed to Load Dashboard</p>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
-            Tidak dapat mengambil data dasbor. Silakan periksa apakah layanan backend sedang berjalan.
+            Could not fetch dashboard data. Please check if backend service is running.
           </p>
           <button
             onClick={() => refetch()}
             className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold hover:bg-red-500 transition-colors text-white"
           >
-            Coba Hubungkan Kembali
+            Try Reconnecting
           </button>
         </div>
       </div>
@@ -92,9 +92,9 @@ export const DashboardPage: React.FC = () => {
   const formatTxType = (type: string) => {
     switch (type) {
       case "Income":
-        return "Pendapatan";
+        return "Income";
       case "Expense":
-        return "Pengeluaran";
+        return "Expense";
       case "Transfer":
         return "Transfer";
       default:
@@ -124,7 +124,7 @@ export const DashboardPage: React.FC = () => {
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-600 dark:text-zinc-300 transition-colors border border-zinc-200 dark:border-zinc-700"
-            title="Ubah Tema"
+            title="Change Theme"
             data-testid="theme-toggle-button"
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -136,7 +136,7 @@ export const DashboardPage: React.FC = () => {
             data-testid="logout-button"
           >
             <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Keluar</span>
+            <span className="hidden sm:inline">Sign Out</span>
           </button>
         </div>
       </header>
@@ -148,10 +148,10 @@ export const DashboardPage: React.FC = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
           <div className="space-y-1">
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
-              Halo, {user?.first_name || "Keluarga"} 👋
+              Hello, {user?.first_name || "Sign Outga"} 👋
             </h1>
             <p className="text-zinc-500 dark:text-zinc-400 text-sm sm:text-base">
-              Berikut adalah ringkasan keuangan Anda bulan ini.
+              Here is your financial summary for this month.
             </p>
           </div>
           <div className="flex gap-2">
@@ -160,14 +160,14 @@ export const DashboardPage: React.FC = () => {
               className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition-all shadow-md shadow-emerald-950/20 active:scale-95 cursor-pointer"
               data-testid="hero-income-button"
             >
-              <Plus className="h-4 w-4" /> Catat Pendapatan
+              <Plus className="h-4 w-4" /> Log Income
             </button>
             <button
               onClick={() => setActiveModal("expense")}
               className="flex items-center gap-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-250 dark:bg-zinc-800 dark:hover:bg-zinc-700 px-4 py-2.5 text-sm font-semibold text-zinc-700 dark:text-white transition-all active:scale-95 border border-zinc-200 dark:border-zinc-700 cursor-pointer"
               data-testid="hero-expense-button"
             >
-              <Minus className="h-4 w-4" /> Catat Pengeluaran
+              <Minus className="h-4 w-4" /> Log Expense
             </button>
           </div>
         </div>
@@ -177,7 +177,7 @@ export const DashboardPage: React.FC = () => {
           {/* Total Balance */}
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-sm transition-colors duration-200">
             <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-              <span className="text-xs font-semibold uppercase tracking-wider">Total Saldo</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">Total Balance</span>
               <div className="bg-blue-500/10 p-2 rounded-lg text-blue-600 dark:text-blue-400">
                 <Wallet className="h-4 w-4" />
               </div>
@@ -186,14 +186,14 @@ export const DashboardPage: React.FC = () => {
               <p className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
                 {formatCurrency(dashboardData.total_balance)}
               </p>
-              <p className="text-xs text-zinc-450 dark:text-zinc-500">Di seluruh akun</p>
+              <p className="text-xs text-zinc-450 dark:text-zinc-500">Across all accounts</p>
             </div>
           </div>
 
           {/* Income This Month */}
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-sm transition-colors duration-200">
             <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-              <span className="text-xs font-semibold uppercase tracking-wider">Pendapatan Bulan Ini</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">Income This Month</span>
               <div className="bg-emerald-500/10 p-2 rounded-lg text-emerald-600 dark:text-emerald-400">
                 <ArrowUpRight className="h-4 w-4" />
               </div>
@@ -202,14 +202,14 @@ export const DashboardPage: React.FC = () => {
               <p className="text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
                 {formatCurrency(dashboardData.income_this_month)}
               </p>
-              <p className="text-xs text-zinc-450 dark:text-zinc-500">Dicatat sejak awal bulan</p>
+              <p className="text-xs text-zinc-450 dark:text-zinc-500">Recorded since start of month</p>
             </div>
           </div>
 
           {/* Expense This Month */}
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-sm transition-colors duration-200">
             <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-              <span className="text-xs font-semibold uppercase tracking-wider">Pengeluaran Bulan Ini</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">Expense This Month</span>
               <div className="bg-rose-500/10 p-2 rounded-lg text-rose-600 dark:text-rose-400">
                 <ArrowDownRight className="h-4 w-4" />
               </div>
@@ -218,14 +218,14 @@ export const DashboardPage: React.FC = () => {
               <p className="text-2xl font-bold tracking-tight text-rose-650 dark:text-rose-400">
                 {formatCurrency(dashboardData.expense_this_month)}
               </p>
-              <p className="text-xs text-zinc-450 dark:text-zinc-500">Dicatat sejak awal bulan</p>
+              <p className="text-xs text-zinc-450 dark:text-zinc-500">Recorded since start of month</p>
             </div>
           </div>
 
           {/* Net Balance */}
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-5 space-y-3 relative overflow-hidden shadow-sm transition-colors duration-200">
             <div className="flex items-center justify-between text-zinc-500 dark:text-zinc-400">
-              <span className="text-xs font-semibold uppercase tracking-wider">Saldo Bersih</span>
+              <span className="text-xs font-semibold uppercase tracking-wider">Net Balance</span>
               <div className="bg-violet-500/10 p-2 rounded-lg text-violet-600 dark:text-violet-400">
                 <TrendingUp className="h-4 w-4" />
               </div>
@@ -234,7 +234,7 @@ export const DashboardPage: React.FC = () => {
               <p className={`text-2xl font-bold tracking-tight ${dashboardData.net_balance >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
                 {formatCurrency(dashboardData.net_balance)}
               </p>
-              <p className="text-xs text-zinc-450 dark:text-zinc-500">Pendapatan dikurangi pengeluaran</p>
+              <p className="text-xs text-zinc-450 dark:text-zinc-500">Income minus expenses</p>
             </div>
           </div>
         </div>
@@ -247,7 +247,7 @@ export const DashboardPage: React.FC = () => {
             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-sm space-y-5 transition-colors duration-200">
               <div className="flex items-center gap-2 text-zinc-900 dark:text-white">
                 <PieChart className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
-                <h2 className="text-lg font-bold tracking-tight">Rincian Alokasi Keuangan</h2>
+                <h2 className="text-lg font-bold tracking-tight">Financial Allocation Breakdown</h2>
               </div>
               <div className="flex flex-col sm:flex-row items-center justify-around gap-6 py-2">
                 {/* SVG Donut */}
@@ -303,7 +303,7 @@ export const DashboardPage: React.FC = () => {
                     )}
                   </svg>
                   <div className="absolute flex flex-col items-center justify-center text-center p-4">
-                    <span className="text-[10px] text-zinc-550 dark:text-zinc-500 font-bold uppercase tracking-widest">Nilai Bersih</span>
+                    <span className="text-[10px] text-zinc-550 dark:text-zinc-500 font-bold uppercase tracking-widest">Net Value</span>
                     <span className="text-sm font-extrabold text-zinc-900 dark:text-white leading-tight mt-0.5">
                       {formatCurrency(dashboardData.net_balance)}
                     </span>
@@ -315,7 +315,7 @@ export const DashboardPage: React.FC = () => {
                   <div className="flex justify-between items-center bg-zinc-50 dark:bg-zinc-950/40 p-2.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800/60 transition-colors duration-200">
                     <div className="flex items-center gap-2.5">
                       <div className="h-3 w-3 rounded-full bg-blue-500"></div>
-                      <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Total Saldo</span>
+                      <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Total Balance</span>
                     </div>
                     <div className="text-right">
                       <p className="text-xs font-bold text-zinc-900 dark:text-white">{formatCurrency(dashboardData.total_balance)}</p>
@@ -326,7 +326,7 @@ export const DashboardPage: React.FC = () => {
                   <div className="flex justify-between items-center bg-zinc-50 dark:bg-zinc-950/40 p-2.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800/60 transition-colors duration-200">
                     <div className="flex items-center gap-2.5">
                       <div className="h-3 w-3 rounded-full bg-emerald-500"></div>
-                      <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Pendapatan</span>
+                      <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Income</span>
                     </div>
                     <div className="text-right">
                       <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(dashboardData.income_this_month)}</p>
@@ -337,7 +337,7 @@ export const DashboardPage: React.FC = () => {
                   <div className="flex justify-between items-center bg-zinc-50 dark:bg-zinc-950/40 p-2.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800/60 transition-colors duration-200">
                     <div className="flex items-center gap-2.5">
                       <div className="h-3 w-3 rounded-full bg-rose-500"></div>
-                      <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Pengeluaran</span>
+                      <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Expense</span>
                     </div>
                     <div className="text-right">
                       <p className="text-xs font-bold text-rose-600 dark:text-rose-400">{formatCurrency(dashboardData.expense_this_month)}</p>
@@ -353,14 +353,14 @@ export const DashboardPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-zinc-900 dark:text-white">
                   <PieChart className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
-                  <h2 className="text-lg font-bold tracking-tight">Ringkasan Anggaran</h2>
+                  <h2 className="text-lg font-bold tracking-tight">Budget Summary</h2>
                 </div>
-                <span className="text-xs text-zinc-550 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full font-medium transition-colors duration-200">Bulan Ini</span>
+                <span className="text-xs text-zinc-550 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full font-medium transition-colors duration-200">This Month</span>
               </div>
 
               <div className="space-y-4">
                 {dashboardData.budget_summary.length === 0 ? (
-                  <p className="text-sm text-zinc-550 dark:text-zinc-500 text-center py-4">Belum ada anggaran bulanan yang dikonfigurasi.</p>
+                  <p className="text-sm text-zinc-550 dark:text-zinc-500 text-center py-4">No monthly budget configured yet.</p>
                 ) : (
                   dashboardData.budget_summary.map((budget, idx) => {
                     const percent = Math.min((budget.actual / budget.planned) * 100, 100);
@@ -382,11 +382,11 @@ export const DashboardPage: React.FC = () => {
                         </div>
                         <div className="flex justify-between items-center text-xs">
                           {isOver ? (
-                            <span className="text-rose-600 dark:text-rose-400 font-medium">Melebihi anggaran sebesar {formatCurrency(Math.abs(budget.remaining))}</span>
+                            <span className="text-rose-600 dark:text-rose-400 font-medium">Over budget by {formatCurrency(Math.abs(budget.remaining))}</span>
                           ) : (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Tersisa {formatCurrency(budget.remaining)}</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Remaining {formatCurrency(budget.remaining)}</span>
                           )}
-                          <span className="text-zinc-500">{percent.toFixed(0)}% terpakai</span>
+                          <span className="text-zinc-500">{percent.toFixed(0)}% used</span>
                         </div>
                       </div>
                     );
@@ -400,7 +400,7 @@ export const DashboardPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-zinc-900 dark:text-white">
                   <ArrowLeftRight className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
-                  <h2 className="text-lg font-bold tracking-tight">Transaksi Terkini</h2>
+                  <h2 className="text-lg font-bold tracking-tight">Recent Transactions</h2>
                 </div>
               </div>
 
@@ -408,17 +408,17 @@ export const DashboardPage: React.FC = () => {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-zinc-200 dark:border-zinc-800 text-xs text-zinc-500 uppercase font-semibold">
-                      <th className="py-3 px-1">Deskripsi</th>
-                      <th className="py-3 px-1">Tipe</th>
-                      <th className="py-3 px-1">Tanggal</th>
-                      <th className="py-3 px-1 text-right">Jumlah</th>
+                      <th className="py-3 px-1">Description</th>
+                      <th className="py-3 px-1">Type</th>
+                      <th className="py-3 px-1">Date</th>
+                      <th className="py-3 px-1 text-right">Amount</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-200/50 dark:divide-zinc-800/50 text-sm">
                     {dashboardData.recent_transactions.length === 0 ? (
                       <tr>
                         <td colSpan={4} className="py-6 text-center text-zinc-500">
-                          Transaksi tidak ditemukan.
+                          No transactions found.
                         </td>
                       </tr>
                     ) : (
@@ -473,13 +473,13 @@ export const DashboardPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-zinc-900 dark:text-white">
                   <Target className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
-                  <h2 className="text-lg font-bold tracking-tight">Tujuan Tabungan</h2>
+                  <h2 className="text-lg font-bold tracking-tight">Saving Goals</h2>
                 </div>
               </div>
 
               <div className="space-y-4">
                 {dashboardData.saving_goals.length === 0 ? (
-                  <p className="text-sm text-zinc-550 dark:text-zinc-500 text-center py-4">Belum ada tujuan tabungan yang ditentukan.</p>
+                  <p className="text-sm text-zinc-550 dark:text-zinc-500 text-center py-4">No saving goals defined yet.</p>
                 ) : (
                   dashboardData.saving_goals.map((goal, idx) => (
                     <div key={idx} className="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 space-y-2 transition-colors duration-200">
@@ -506,7 +506,7 @@ export const DashboardPage: React.FC = () => {
             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-sm space-y-4 transition-colors duration-200">
               <div className="flex items-center gap-2 text-zinc-900 dark:text-white">
                 <Sparkles className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
-                <h2 className="text-lg font-bold tracking-tight">Tindakan Cepat</h2>
+                <h2 className="text-lg font-bold tracking-tight">Quick Actions</h2>
               </div>
 
               <div className="grid grid-cols-1 gap-2.5">
@@ -519,8 +519,8 @@ export const DashboardPage: React.FC = () => {
                     <Plus className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-zinc-900 dark:text-white">Catat Pendapatan</p>
-                    <p className="text-xs text-zinc-500">Tambahkan pemasukan kas atau gaji</p>
+                    <p className="font-semibold text-zinc-900 dark:text-white">Log Income</p>
+                    <p className="text-xs text-zinc-500">Add cash income or salary</p>
                   </div>
                 </button>
 
@@ -533,8 +533,8 @@ export const DashboardPage: React.FC = () => {
                     <Minus className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-zinc-900 dark:text-white">Catat Pengeluaran</p>
-                    <p className="text-xs text-zinc-500">Tambahkan pengeluaran atau pembayaran</p>
+                    <p className="font-semibold text-zinc-900 dark:text-white">Log Expense</p>
+                    <p className="text-xs text-zinc-500">Add expenses or payments</p>
                   </div>
                 </button>
 
@@ -547,8 +547,8 @@ export const DashboardPage: React.FC = () => {
                     <ArrowLeftRight className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-zinc-900 dark:text-white">Transfer Uang</p>
-                    <p className="text-xs text-zinc-500">Pindahkan dana antar rekening</p>
+                    <p className="font-semibold text-zinc-900 dark:text-white">Transfer Money</p>
+                    <p className="text-xs text-zinc-500">Move funds between accounts</p>
                   </div>
                 </button>
               </div>
@@ -566,7 +566,7 @@ export const DashboardPage: React.FC = () => {
                 {activeModal === "income" && <Plus className="h-4 w-4 text-emerald-500" />}
                 {activeModal === "expense" && <Minus className="h-4 w-4 text-rose-500" />}
                 {activeModal === "transfer" && <ArrowLeftRight className="h-4 w-4 text-blue-500" />}
-                Catat {activeModal === "income" ? "Pendapatan" : activeModal === "expense" ? "Pengeluaran" : "Transfer"}
+                Log {activeModal === "income" ? "Income" : activeModal === "expense" ? "Expense" : "Transfer"}
               </h3>
               <button
                 onClick={() => setActiveModal(null)}
@@ -578,12 +578,12 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="p-6 space-y-4">
               <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                Anda telah memicu formulir untuk <strong className="text-emerald-600 dark:text-emerald-400 capitalize">{activeModal === "income" ? "Pendapatan" : activeModal === "expense" ? "Pengeluaran" : "Transfer"}</strong>.
+                You have triggered the form for <strong className="text-emerald-600 dark:text-emerald-400 capitalize">{activeModal === "income" ? "Income" : activeModal === "expense" ? "Expense" : "Transfer"}</strong>.
               </p>
               <div className="rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-4 space-y-2 transition-colors duration-200">
-                <span className="text-xs font-semibold text-emerald-650 dark:text-emerald-500 uppercase tracking-widest block">Segera Hadir</span>
+                <span className="text-xs font-semibold text-emerald-650 dark:text-emerald-500 uppercase tracking-widest block">Coming Soon</span>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                  Formulir input transaksi interaktif dan perhitungan saldo dinamis akan diimplementasikan pada fase fitur berikutnya (Milestone 3: Buku Besar Transaksi).
+                  Interactive transaction input form and dynamic balance calculation will be implemented in the next feature phase (Milestone 3: Transaction Ledger).
                 </p>
               </div>
               <button
@@ -591,7 +591,7 @@ export const DashboardPage: React.FC = () => {
                 className="w-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-sm text-zinc-800 dark:text-white font-semibold py-2.5 rounded-xl transition-all border border-zinc-200 dark:border-zinc-700/60 cursor-pointer"
                 data-testid="modal-close-button"
               >
-                Tutup
+                Close
               </button>
             </div>
           </div>

@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (session && session.user) {
-          // Coba ambil dari tabel 'users' (atau sesuaikan dengan nama tabel Anda)
+          // Try fetching from table 'users' (atau sesuaikan dengan nama tabel Anda)
           const { data: profile } = await supabase
             .from("users")
             .select("first_name, last_name")
@@ -51,7 +51,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser({
             id: session.user.id,
             email: session.user.email || "",
-            first_name: profile?.first_name || session.user.user_metadata?.first_name || "Keluarga",
+            first_name: profile?.first_name || session.user.user_metadata?.first_name || "Family",
             last_name: profile?.last_name || session.user.user_metadata?.last_name || "",
           });
         } else {
@@ -104,4 +104,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const context = React.useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };
