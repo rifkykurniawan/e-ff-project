@@ -45,14 +45,23 @@ export function CategoryForm({ initialData, onSubmit, isSubmitting }: CategoryFo
         <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
           Category Type
         </label>
-        <select
-          {...register("type")}
-          className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-        >
-          {categoryTypes.map(type => (
-            <option key={type} value={type}>{type}</option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            {...register("type")}
+            className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+              errors.type ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+            }`}
+          >
+            {categoryTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+        </div>
         {errors.type && <p className="mt-1 text-xs text-red-500">{errors.type.message}</p>}
       </div>
 
