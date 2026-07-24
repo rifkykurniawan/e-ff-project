@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Wallet, Tags, LogOut } from "lucide-react";
+import { LayoutDashboard, Wallet, Tags, LogOut, ArrowLeftRight } from "lucide-react";
 import { useAuth } from "../components/AuthContext";
 
 export function MainLayout() {
@@ -10,6 +10,7 @@ export function MainLayout() {
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
     { name: "Accounts", path: "/accounts", icon: Wallet },
     { name: "Categories", path: "/categories", icon: Tags },
+    { name: "Transactions", path: "/transactions", icon: ArrowLeftRight },
   ];
 
   return (

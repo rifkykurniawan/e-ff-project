@@ -8,6 +8,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { AccountsPage } from "./pages/AccountsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
+import { TransactionsPage } from "./pages/TransactionsPage";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ function App() {
                   <Route path="/" element={<DashboardPage />} />
                   <Route path="/accounts" element={<AccountsPage />} />
                   <Route path="/categories" element={<CategoriesPage />} />
+                  <Route path="/transactions" element={<TransactionsPage />} />
                 </Route>
               </Route>
             </Routes>
