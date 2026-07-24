@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Wallet, Tags, LogOut, ArrowLeftRight, PieChart, PiggyBank, Sun, Moon, Eye, EyeOff } from "lucide-react";
+import { LayoutDashboard, Wallet, Tags, LogOut, ArrowLeftRight, PieChart, PiggyBank, Sun, Moon, Eye, EyeOff, BarChart3 } from "lucide-react";
 import { useAuth } from "../components/AuthContext";
 import { useTheme } from "../components/ThemeContext";
 
@@ -35,6 +35,7 @@ export function MainLayout() {
     { name: "Transactions", path: "/transactions", icon: ArrowLeftRight },
     { name: "Budgets", path: "/budgets", icon: PieChart },
     { name: "Saving Goals", path: "/saving-goals", icon: PiggyBank },
+    { name: "Reports", path: "/reports", icon: BarChart3 },
   ];
 
   return (
