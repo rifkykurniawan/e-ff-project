@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useDashboard } from "../hooks/useDashboard";
-import { useNavigate } from "react-router-dom";
-import { useTheme } from "../components/ThemeContext";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
 import { useTransactions } from "../hooks/useTransactions";
@@ -15,48 +14,25 @@ import {
   ArrowLeftRight,
   TrendingUp,
   Target,
-  LogOut,
   X,
   Plus,
   Minus,
   Sparkles,
-  PieChart,
-  Sun,
-  Moon,
-  Eye,
-  EyeOff
+  PieChart
 } from "lucide-react";
 
 export const DashboardPage: React.FC = () => {
-  const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
   const { data: dashboardData, isLoading, isError, refetch } = useDashboard();
   const navigate = useNavigate();
+  const { showBalances } = useOutletContext<{ showBalances: boolean }>();
 
   const { accounts } = useAccounts();
   const { categories } = useCategories();
   const { createTransaction, isCreating } = useTransactions();
 
-  const [showBalances, setShowBalances] = useState<boolean>(() => {
-    const saved = localStorage.getItem("show_balances");
-    return saved !== "false";
-  });
-
-  const toggleShowBalances = () => {
-    setShowBalances((prev) => {
-      const next = !prev;
-      localStorage.setItem("show_balances", String(next));
-      return next;
-    });
-  };
-
   // Quick Action Modal State
   const [activeModal, setActiveModal] = useState<"income" | "expense" | "transfer" | null>(null);
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
 
   // Currency Formatter
   const formatCurrency = (val: number) => {
@@ -141,56 +117,7 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white flex flex-col transition-colors duration-200">
-      {/* Header */}
-      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/50 backdrop-blur px-6 py-4 flex items-center justify-between sticky top-0 z-10 transition-colors duration-200">
-        <div className="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-500">
-          <div className="bg-emerald-500/10 p-2 rounded-lg">
-            <Wallet className="h-5 w-5" />
-          </div>
-          <span className="font-bold text-lg text-zinc-900 dark:text-white tracking-tight"> Finance</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex flex-col text-right">
-            <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-              {user?.first_name} {user?.last_name}
-            </span>
-            <span className="text-xs text-zinc-500">{user?.email}</span>
-          </div>
-
-          {/* Hide/Show Balances Toggle */}
-          <button
-            onClick={toggleShowBalances}
-            className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-600 dark:text-zinc-300 transition-colors border border-zinc-200 dark:border-zinc-700"
-            title={showBalances ? "Hide Balances" : "Show Balances"}
-            data-testid="balance-visibility-toggle"
-          >
-            {showBalances ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-
-          {/* Theme Switcher Button */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-600 dark:text-zinc-300 transition-colors border border-zinc-200 dark:border-zinc-700"
-            title="Change Theme"
-            data-testid="theme-toggle-button"
-          >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 px-3 py-1.5 text-sm font-medium transition-colors text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-700"
-            data-testid="logout-button"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign Out</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="space-y-6">
         {/* Welcome Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-md relative overflow-hidden transition-colors duration-200">
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -208,14 +135,14 @@ export const DashboardPage: React.FC = () => {
               className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition-all shadow-md shadow-emerald-950/20 active:scale-95 cursor-pointer"
               data-testid="hero-income-button"
             >
-              <Plus className="h-4 w-4" /> Log Income
+              <Plus className="h-4 w-4" /> Income
             </button>
             <button
               onClick={() => setActiveModal("expense")}
               className="flex items-center gap-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-250 dark:bg-zinc-800 dark:hover:bg-zinc-700 px-4 py-2.5 text-sm font-semibold text-zinc-700 dark:text-white transition-all active:scale-95 border border-zinc-200 dark:border-zinc-700 cursor-pointer"
               data-testid="hero-expense-button"
             >
-              <Minus className="h-4 w-4" /> Log Expense
+              <Minus className="h-4 w-4" /> Expense
             </button>
           </div>
         </div>
@@ -567,7 +494,7 @@ export const DashboardPage: React.FC = () => {
                     <Plus className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-zinc-900 dark:text-white">Log Income</p>
+                    <p className="font-semibold text-zinc-900 dark:text-white">Income</p>
                     <p className="text-xs text-zinc-500">Add cash income or salary</p>
                   </div>
                 </button>
@@ -581,7 +508,7 @@ export const DashboardPage: React.FC = () => {
                     <Minus className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="font-semibold text-zinc-900 dark:text-white">Log Expense</p>
+                    <p className="font-semibold text-zinc-900 dark:text-white">Expense</p>
                     <p className="text-xs text-zinc-500">Add expenses or payments</p>
                   </div>
                 </button>
@@ -603,7 +530,6 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </main>
 
       {/* Quick Action Modal Placeholder */}
       {activeModal && (

@@ -66,6 +66,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, []);
 
+  // Auto logout after 4 hours of inactivity
+  useEffect(() => {
+    if (!user) return;
+
+    let lastActivity = Date.now();
+    const fourHours = 4 * 60 * 60 * 1000;
+
+    const resetTimer = () => {
+      lastActivity = Date.now();
+    };
+
+    const events = ["mousedown", "keydown", "scroll", "touchstart", "click"];
+    events.forEach((event) => {
+      window.addEventListener(event, resetTimer);
+    });
+
+    const interval = setInterval(() => {
+      const timeSinceLastActivity = Date.now() - lastActivity;
+      if (timeSinceLastActivity >= fourHours) {
+        console.log("Auto-logging out due to 4 hours of inactivity.");
+        logout();
+      }
+    }, 15000); // Check every 15 seconds
+
+    return () => {
+      events.forEach((event) => {
+        window.removeEventListener(event, resetTimer);
+      });
+      clearInterval(interval);
+    };
+  }, [user]);
+
   const login = async (credentials: LoginCredentials) => {
     setLoading(true);
     try {

@@ -61,6 +61,23 @@ export const transactionsService = {
     return data;
   },
 
+  async updateTransaction(id: string, input: Partial<TransactionInput>): Promise<Transaction> {
+    const { data, error } = await supabase
+      .from("transactions")
+      .update(input)
+      .eq("id", id)
+      .select(`
+        *,
+        source_accounts:accounts!transactions_source_account_id_fkey(name),
+        destination_accounts:accounts!transactions_destination_account_id_fkey(name),
+        categories:categories(name)
+      `)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
   async deleteTransaction(id: string): Promise<void> {
     const { error } = await supabase
       .from("transactions")

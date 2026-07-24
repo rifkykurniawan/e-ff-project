@@ -16,6 +16,7 @@ export function useBudgets(year: number, month: number) {
     mutationFn: (input: BudgetInput) => budgetsService.createBudget(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BUDGETS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 
@@ -24,6 +25,7 @@ export function useBudgets(year: number, month: number) {
       budgetsService.updateBudget(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BUDGETS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 
@@ -31,6 +33,7 @@ export function useBudgets(year: number, month: number) {
     mutationFn: (id: string) => budgetsService.deleteBudget(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BUDGETS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 

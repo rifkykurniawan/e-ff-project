@@ -16,6 +16,7 @@ export function useSavingGoals() {
     mutationFn: (input: SavingGoalInput) => savingGoalsService.createSavingGoal(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SAVING_GOALS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 
@@ -24,6 +25,7 @@ export function useSavingGoals() {
       savingGoalsService.updateSavingGoal(id, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SAVING_GOALS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 
@@ -31,6 +33,7 @@ export function useSavingGoals() {
     mutationFn: (id: string) => savingGoalsService.deleteSavingGoal(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SAVING_GOALS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 

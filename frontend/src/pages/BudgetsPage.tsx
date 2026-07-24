@@ -7,12 +7,23 @@ import { Modal } from "../components/Modal";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { budgetSchema, type BudgetInput, type Budget } from "../types/budgets";
+import { useOutletContext } from "react-router-dom";
 
 export function BudgetsPage() {
   const currentDate = new Date();
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
   const [editingBudget, setEditingBudget] = useState<{ categoryId: string; categoryName: string; budget?: Budget } | null>(null);
+  const { showBalances } = useOutletContext<{ showBalances: boolean }>();
+
+  const formatAmount = (val: number) => {
+    return showBalances ? `Rp ${val.toLocaleString()}` : "Rp ••••••";
+  };
+
+  const formatRemaining = (val: number) => {
+    if (!showBalances) return "Rp ••••••";
+    return `${val < 0 ? "-" : ""}Rp ${Math.abs(val).toLocaleString()}`;
+  };
 
   const { categories } = useCategories();
   const { budgets, isLoading: isBudgetsLoading, createBudget, updateBudget } = useBudgets(selectedYear, selectedMonth);
@@ -171,16 +182,16 @@ export function BudgetsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
           <div className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider">Total Planned Budget</div>
-          <div className="text-2xl font-bold text-zinc-900 dark:text-white mt-1">Rp {totalPlanned.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-zinc-900 dark:text-white mt-1">{formatAmount(totalPlanned)}</div>
         </div>
         <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
           <div className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider">Total Spent</div>
-          <div className="text-2xl font-bold text-red-500 mt-1">Rp {totalActual.toLocaleString()}</div>
+          <div className="text-2xl font-bold text-red-500 mt-1">{formatAmount(totalActual)}</div>
         </div>
         <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
           <div className="text-zinc-500 dark:text-zinc-400 text-xs font-semibold uppercase tracking-wider">Remaining Budget</div>
           <div className={`text-2xl font-bold mt-1 ${totalRemaining < 0 ? "text-red-500" : "text-emerald-500"}`}>
-            Rp {totalRemaining.toLocaleString()}
+            {formatRemaining(totalRemaining)}
           </div>
         </div>
       </div>
@@ -231,19 +242,19 @@ export function BudgetsPage() {
                     
                     {/* Planned Limit */}
                     <td className="p-4 text-sm text-zinc-900 dark:text-zinc-300 text-right font-medium align-top">
-                      {existingBudget ? `Rp ${planned.toLocaleString()}` : (
+                      {existingBudget ? formatAmount(planned) : (
                         <span className="text-zinc-400 dark:text-zinc-600 italic">Not set</span>
                       )}
                     </td>
 
                     {/* Actual Spent */}
                     <td className="p-4 text-sm text-zinc-900 dark:text-zinc-300 text-right font-medium align-top">
-                      Rp {actual.toLocaleString()}
+                      {formatAmount(actual)}
                     </td>
 
                     {/* Remaining */}
                     <td className={`p-4 text-sm text-right font-semibold align-top ${isOverBudget ? "text-red-500" : "text-zinc-900 dark:text-zinc-300"}`}>
-                      {remaining < 0 ? "-" : ""}Rp {Math.abs(remaining).toLocaleString()}
+                      {formatRemaining(remaining)}
                     </td>
 
                     {/* Progress Bar & Badges */}

@@ -31,6 +31,16 @@ export function useTransactions(filters?: TransactionFilters) {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, input }: { id: string; input: Partial<TransactionInput> }) =>
+      transactionsService.updateTransaction(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ACCOUNTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+
   return {
     transactions: query.data || [],
     isLoading: query.isLoading,
@@ -38,8 +48,10 @@ export function useTransactions(filters?: TransactionFilters) {
     error: query.error,
     refetch: query.refetch,
     createTransaction: createMutation.mutateAsync,
+    updateTransaction: updateMutation.mutateAsync,
     deleteTransaction: deleteMutation.mutateAsync,
     isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
   };
 }

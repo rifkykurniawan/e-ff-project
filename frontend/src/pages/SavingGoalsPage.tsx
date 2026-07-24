@@ -1,17 +1,40 @@
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Calendar, Target, Award } from "lucide-react";
+import { Plus, Edit2, Trash2, Calendar, Target, Award, PiggyBank } from "lucide-react";
 import { useSavingGoals } from "../hooks/useSavingGoals";
 import { Modal } from "../components/Modal";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { savingGoalSchema, type SavingGoalInput, type SavingGoal } from "../types/savingGoals";
+import { useAccounts } from "../hooks/useAccounts";
+import { useCategories } from "../hooks/useCategories";
+import { useTransactions } from "../hooks/useTransactions";
+import { z } from "zod";
+import { useOutletContext } from "react-router-dom";
+
+const addSavingsSchema = z.object({
+  amount: z.coerce.number().positive("Amount must be greater than 0"),
+  source_account_id: z.string().uuid("Please select a valid source account"),
+  category_id: z.string().uuid("Please select a valid category"),
+  date: z.string().min(1, "Date is required"),
+});
+type AddSavingsInput = z.infer<typeof addSavingsSchema>;
 
 export function SavingGoalsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingGoal | null>(null);
+  const [addingSavingsGoal, setAddingSavingsGoal] = useState<SavingGoal | null>(null);
+  const { showBalances } = useOutletContext<{ showBalances: boolean }>();
+
+  const formatAmount = (val: number) => {
+    return showBalances ? `Rp ${val.toLocaleString()}` : "Rp ••••••";
+  };
 
   const { savingGoals, isLoading, createSavingGoal, updateSavingGoal, deleteSavingGoal } = useSavingGoals();
+  const { accounts } = useAccounts();
+  const { categories } = useCategories();
+  const { createTransaction, isCreating: isLoggingTransaction } = useTransactions();
 
+  // Form for Set/Edit Goal
   const {
     register,
     handleSubmit,
@@ -25,6 +48,22 @@ export function SavingGoalsPage() {
       current_amount: 0,
       target_date: "",
       notes: "",
+    }
+  });
+
+  // Form for Add Savings Modal
+  const {
+    register: registerSavings,
+    handleSubmit: handleSubmitSavings,
+    formState: { errors: savingsErrors },
+    reset: resetSavings,
+  } = useForm<AddSavingsInput>({
+    resolver: zodResolver(addSavingsSchema) as any,
+    defaultValues: {
+      amount: undefined as any,
+      source_account_id: "",
+      category_id: "",
+      date: new Date().toISOString().split("T")[0]
     }
   });
 
@@ -55,6 +94,59 @@ export function SavingGoalsPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingGoal(null);
+  };
+
+  const handleOpenAddSavings = (goal: SavingGoal) => {
+    setAddingSavingsGoal(goal);
+    const matchedCategory = categories.find(
+      (c) => c.type === "Expense" && 
+      (c.name.toLowerCase().includes("saving") || c.name.toLowerCase().includes("tabungan"))
+    );
+    resetSavings({
+      amount: undefined as any,
+      source_account_id: "",
+      category_id: matchedCategory?.id || categories.find(c => c.type === "Expense")?.id || "",
+      date: new Date().toISOString().split("T")[0]
+    });
+  };
+
+  const handleCloseSavingsModal = () => {
+    setAddingSavingsGoal(null);
+    resetSavings();
+  };
+
+  const onSavingsFormSubmit = async (data: AddSavingsInput) => {
+    if (!addingSavingsGoal) return;
+    
+    const potentialNewAmount = Number(addingSavingsGoal.current_amount) + Number(data.amount);
+    if (potentialNewAmount > Number(addingSavingsGoal.target_amount)) {
+      alert("Added amount exceeds target goal limit.");
+      return;
+    }
+
+    try {
+      await updateSavingGoal({
+        id: addingSavingsGoal.id,
+        input: {
+          current_amount: potentialNewAmount
+        }
+      });
+
+      await createTransaction({
+        description: `Savings: ${addingSavingsGoal.name}`,
+        amount: data.amount,
+        type: "Expense",
+        date: data.date,
+        source_account_id: data.source_account_id,
+        category_id: data.category_id,
+        notes: `Savings contribution to goal "${addingSavingsGoal.name}"`
+      });
+
+      handleCloseSavingsModal();
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Failed to add savings.");
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -164,7 +256,7 @@ export function SavingGoalsPage() {
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between items-end text-xs font-semibold">
                       <span className="text-zinc-500 dark:text-zinc-400">
-                        Rp {goal.current_amount.toLocaleString()} / Rp {goal.target_amount.toLocaleString()}
+                        {formatAmount(goal.current_amount)} / {formatAmount(goal.target_amount)}
                       </span>
                       <span className="text-emerald-600 dark:text-emerald-400 font-bold">{progress.toFixed(0)}%</span>
                     </div>
@@ -179,17 +271,25 @@ export function SavingGoalsPage() {
                   </div>
 
                   {/* Actions footer */}
-                  <div className="flex justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
+                  <div className="flex justify-end items-center gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
+                    <button
+                      onClick={() => handleOpenAddSavings(goal)}
+                      disabled={isCompleted}
+                      className="flex-1 mr-2 flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+                    >
+                      <PiggyBank className="h-3.5 w-3.5" />
+                      Add Savings
+                    </button>
                     <button
                       onClick={() => handleOpenEditModal(goal)}
-                      className="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-lg transition-all"
+                      className="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-lg transition-all cursor-pointer"
                       title="Edit Goal"
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(goal.id)}
-                      className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all"
+                      className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all cursor-pointer"
                       title="Delete Goal"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -294,6 +394,131 @@ export function SavingGoalsPage() {
               className="w-full sm:w-auto rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
             >
               {editingGoal ? "Save Goal" : "Create Goal"}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Add Savings Modal */}
+      <Modal
+        isOpen={addingSavingsGoal !== null}
+        onClose={handleCloseSavingsModal}
+        title={addingSavingsGoal ? `Add Savings to ${addingSavingsGoal.name}` : "Add Savings"}
+      >
+        <form onSubmit={handleSubmitSavings(onSavingsFormSubmit)} className="space-y-4">
+          {/* Target Info */}
+          {addingSavingsGoal && (
+            <div className="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-505 dark:text-zinc-500 space-y-1">
+              <div className="flex justify-between">
+                <span>Target Amount:</span>
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">{formatAmount(addingSavingsGoal.target_amount)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Current Amount:</span>
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">{formatAmount(addingSavingsGoal.current_amount)}</span>
+              </div>
+              <div className="flex justify-between border-t border-zinc-200 dark:border-zinc-800 pt-1.5 mt-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                <span>Remaining to Save:</span>
+                <span>{formatAmount(addingSavingsGoal.target_amount - addingSavingsGoal.current_amount)}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Amount to Save */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+              Amount to Add (Rp)
+            </label>
+            <input
+              type="number"
+              {...registerSavings("amount")}
+              placeholder="e.g., 500000"
+              className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                savingsErrors.amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+              }`}
+            />
+            {savingsErrors.amount && <p className="mt-1 text-xs text-red-500">{savingsErrors.amount.message}</p>}
+          </div>
+
+          {/* Source Account */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+              Source Account (to Deduct From)
+            </label>
+            <div className="relative">
+              <select
+                {...registerSavings("source_account_id")}
+                className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                  savingsErrors.source_account_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+                }`}
+              >
+                <option value="">Select source account...</option>
+                {accounts.map((acc) => (
+                  <option key={acc.id} value={acc.id}>
+                    {acc.name} (Rp {acc.balance.toLocaleString()})
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+            {savingsErrors.source_account_id && <p className="mt-1 text-xs text-red-500">{savingsErrors.source_account_id.message}</p>}
+          </div>
+
+          {/* Expense Category */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+              Expense Category
+            </label>
+            <div className="relative">
+              <select
+                {...registerSavings("category_id")}
+                className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                  savingsErrors.category_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+                }`}
+              >
+                <option value="">Select category...</option>
+                {categories.filter(c => c.type === "Expense").map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+            {savingsErrors.category_id && <p className="mt-1 text-xs text-red-500">{savingsErrors.category_id.message}</p>}
+          </div>
+
+          {/* Date */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+              Date
+            </label>
+            <input
+              type="date"
+              {...registerSavings("date")}
+              className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                savingsErrors.date ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+              }`}
+            />
+            {savingsErrors.date && <p className="mt-1 text-xs text-red-500">{savingsErrors.date.message}</p>}
+          </div>
+
+          {/* Submit */}
+          <div className="pt-4 flex justify-end">
+            <button
+              type="submit"
+              disabled={isLoggingTransaction}
+              className="w-full sm:w-auto rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors cursor-pointer"
+            >
+              {isLoggingTransaction ? "Adding Savings..." : "Confirm & Add"}
             </button>
           </div>
         </form>

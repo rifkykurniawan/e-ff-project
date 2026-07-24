@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { transactionSchema, transactionTypes, type TransactionInput } from "../../types/transactions";
 import type { Account } from "../../types/accounts";
 import type { Category } from "../../types/categories";
@@ -11,9 +11,10 @@ interface TransactionFormProps {
   onSubmit: (data: TransactionInput) => Promise<void>;
   isSubmitting?: boolean;
   defaultType?: "Income" | "Expense" | "Transfer";
+  initialData?: Partial<TransactionInput>;
 }
 
-export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, defaultType }: TransactionFormProps) {
+export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, defaultType, initialData }: TransactionFormProps) {
   const {
     register,
     handleSubmit,
@@ -23,21 +24,26 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, 
   } = useForm<TransactionInput>({
     resolver: zodResolver(transactionSchema) as any,
     defaultValues: {
-      description: "",
-      amount: undefined as any,
-      type: defaultType || "Expense",
-      date: new Date().toISOString().split("T")[0],
-      source_account_id: "",
-      destination_account_id: "",
-      category_id: "",
-      notes: "",
+      description: initialData?.description || "",
+      amount: initialData?.amount !== undefined ? initialData.amount : (undefined as any),
+      type: initialData?.type || defaultType || "Expense",
+      date: initialData?.date || new Date().toISOString().split("T")[0],
+      source_account_id: initialData?.source_account_id || "",
+      destination_account_id: initialData?.destination_account_id || "",
+      category_id: initialData?.category_id || "",
+      notes: initialData?.notes || "",
     },
   });
 
   const selectedType = watch("type");
+  const isFirstMountRef = useRef(true);
 
   // Reset fields when type changes to satisfy validation rules
   useEffect(() => {
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      return;
+    }
     if (selectedType === "Income") {
       setValue("source_account_id", null);
       setValue("category_id", categories.find(c => c.type === "Income")?.id || "");

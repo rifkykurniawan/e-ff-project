@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { Plus, Trash2, ArrowRight, ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Filter, Calendar } from "lucide-react";
+import { Plus, Trash2, Edit2, ArrowRight, ArrowDownLeft, ArrowUpRight, ArrowLeftRight, Filter, Calendar } from "lucide-react";
 import { useTransactions } from "../hooks/useTransactions";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
 import { Modal } from "../components/Modal";
 import { TransactionForm } from "../features/transactions/TransactionForm";
-import type { TransactionInput } from "../types/transactions";
+import type { TransactionInput, Transaction } from "../types/transactions";
+import { useOutletContext } from "react-router-dom";
 
 export function TransactionsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [filters, setFilters] = useState({
     accountId: "",
     categoryId: "",
@@ -16,17 +18,46 @@ export function TransactionsPage() {
     startDate: "",
     endDate: "",
   });
+  const { showBalances } = useOutletContext<{ showBalances: boolean }>();
+
+  const formatAmount = (val: number) => {
+    return showBalances ? `Rp ${val.toLocaleString()}` : "Rp ••••••";
+  };
 
   const { accounts } = useAccounts();
   const { categories } = useCategories();
-  const { transactions, isLoading, createTransaction, deleteTransaction, isCreating } = useTransactions(filters);
+  const { 
+    transactions, 
+    isLoading, 
+    createTransaction, 
+    updateTransaction,
+    deleteTransaction, 
+    isCreating,
+    isUpdating
+  } = useTransactions(filters);
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const handleOpenAddModal = () => {
+    setEditingTransaction(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (t: Transaction) => {
+    setEditingTransaction(t);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingTransaction(null);
+  };
 
   const handleSubmit = async (data: TransactionInput) => {
     try {
-      await createTransaction(data);
+      if (editingTransaction) {
+        await updateTransaction({ id: editingTransaction.id, input: data });
+      } else {
+        await createTransaction(data);
+      }
       handleCloseModal();
     } catch (error: any) {
       console.error("Failed to save transaction", error);
@@ -67,7 +98,7 @@ export function TransactionsPage() {
           <p className="text-zinc-500 dark:text-zinc-400 mt-1">Review and manage your family transaction history.</p>
         </div>
         <button
-          onClick={handleOpenModal}
+          onClick={handleOpenAddModal}
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
         >
           <Plus className="h-4 w-4" />
@@ -263,9 +294,15 @@ export function TransactionsPage() {
                         isExpense ? "text-red-600 dark:text-red-400" :
                         "text-zinc-700 dark:text-zinc-300"
                       }`}>
-                        {isIncome ? "+" : isExpense ? "-" : ""}Rp {t.amount.toLocaleString()}
+                        {isIncome ? "+" : isExpense ? "-" : ""}{formatAmount(t.amount)}
                       </td>
                       <td className="p-4 text-center">
+                        <button
+                          onClick={() => handleOpenEditModal(t)}
+                          className="p-1.5 text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-md transition-colors inline-flex mr-1.5"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </button>
                         <button
                           onClick={() => handleDelete(t.id)}
                           className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors inline-flex"
@@ -286,13 +323,15 @@ export function TransactionsPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="Log Transaction"
+        title={editingTransaction ? "Edit Transaction" : "Log Transaction"}
       >
         <TransactionForm
+          key={editingTransaction ? editingTransaction.id : "new-transaction"}
           accounts={accounts}
           categories={categories}
           onSubmit={handleSubmit}
-          isSubmitting={isCreating}
+          isSubmitting={isCreating || isUpdating}
+          initialData={editingTransaction || undefined}
         />
       </Modal>
     </div>

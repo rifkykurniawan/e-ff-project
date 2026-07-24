@@ -4,11 +4,13 @@ import { useAccounts } from "../hooks/useAccounts";
 import { Modal } from "../components/Modal";
 import { AccountForm } from "../features/accounts/AccountForm";
 import type { Account, AccountInput } from "../types/accounts";
+import { useOutletContext } from "react-router-dom";
 
 export function AccountsPage() {
   const { accounts, isLoading, createAccount, updateAccount, deleteAccount } = useAccounts();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | undefined>();
+  const { showBalances } = useOutletContext<{ showBalances: boolean }>();
 
   const handleOpenModal = (account?: Account) => {
     setEditingAccount(account);
@@ -46,7 +48,8 @@ export function AccountsPage() {
   };
 
   const formatRupiah = (amount: number) => {
-    return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(amount);
+    const formatted = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(amount);
+    return showBalances ? formatted : "Rp ••••••";
   };
 
   if (isLoading) {
