@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useDashboard } from "../hooks/useDashboard";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
 import { useTransactions } from "../hooks/useTransactions";
@@ -24,7 +24,6 @@ import {
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const { data: dashboardData, isLoading, isError, refetch } = useDashboard();
-  const navigate = useNavigate();
   const { showBalances } = useOutletContext<{ showBalances: boolean }>();
 
   const { accounts } = useAccounts();
