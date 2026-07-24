@@ -30,7 +30,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div 
         ref={overlayRef}
@@ -38,22 +38,25 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         onClick={onClose}
       />
       
-      {/* Modal Content */}
-      <div className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 p-6 text-left align-middle shadow-xl transition-all border border-zinc-200 dark:border-zinc-800">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-bold leading-6 text-zinc-900 dark:text-white">
-            {title}
-          </h3>
-          <button
-            onClick={onClose}
-            className="rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        
-        <div className="mt-2">
-          {children}
+      {/* Scrollable container element */}
+      <div className="flex min-h-full items-center justify-center p-4">
+        {/* Modal Content */}
+        <div className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 p-6 text-left align-middle shadow-xl transition-all border border-zinc-200 dark:border-zinc-800 my-8">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-lg font-bold leading-6 text-zinc-900 dark:text-white">
+              {title}
+            </h3>
+            <button
+              onClick={onClose}
+              className="rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          
+          <div className="mt-2">
+            {children}
+          </div>
         </div>
       </div>
     </div>

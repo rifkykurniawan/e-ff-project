@@ -10,9 +10,10 @@ interface TransactionFormProps {
   categories: Category[];
   onSubmit: (data: TransactionInput) => Promise<void>;
   isSubmitting?: boolean;
+  defaultType?: "Income" | "Expense" | "Transfer";
 }
 
-export function TransactionForm({ accounts, categories, onSubmit, isSubmitting }: TransactionFormProps) {
+export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, defaultType }: TransactionFormProps) {
   const {
     register,
     handleSubmit,
@@ -24,7 +25,7 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting }
     defaultValues: {
       description: "",
       amount: undefined as any,
-      type: "Expense",
+      type: defaultType || "Expense",
       date: new Date().toISOString().split("T")[0],
       source_account_id: "",
       destination_account_id: "",

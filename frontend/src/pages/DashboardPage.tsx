@@ -3,6 +3,11 @@ import { useAuth } from "../hooks/useAuth";
 import { useDashboard } from "../hooks/useDashboard";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../components/ThemeContext";
+import { useAccounts } from "../hooks/useAccounts";
+import { useCategories } from "../hooks/useCategories";
+import { useTransactions } from "../hooks/useTransactions";
+import { TransactionForm } from "../features/transactions/TransactionForm";
+import type { TransactionInput } from "../types/transactions";
 import {
   Wallet,
   ArrowUpRight,
@@ -25,6 +30,10 @@ export const DashboardPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { data: dashboardData, isLoading, isError, refetch } = useDashboard();
   const navigate = useNavigate();
+
+  const { accounts } = useAccounts();
+  const { categories } = useCategories();
+  const { createTransaction, isCreating } = useTransactions();
 
   // Quick Action Modal State
   const [activeModal, setActiveModal] = useState<"income" | "expense" | "transfer" | null>(null);
@@ -99,6 +108,16 @@ export const DashboardPage: React.FC = () => {
         return "Transfer";
       default:
         return type;
+    }
+  };
+
+  const handleTransactionSubmit = async (data: TransactionInput) => {
+    try {
+      await createTransaction(data);
+      setActiveModal(null);
+    } catch (error: any) {
+      console.error("Failed to save transaction", error);
+      alert(error.message || "An error occurred while saving the transaction.");
     }
   };
 
@@ -559,8 +578,8 @@ export const DashboardPage: React.FC = () => {
 
       {/* Quick Action Modal Placeholder */}
       {activeModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-scale-up transition-colors duration-200">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-start justify-center p-4 z-50 animate-fade-in overflow-y-auto">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-scale-up transition-colors duration-200 my-8">
             <div className="flex justify-between items-center px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 transition-colors duration-200">
               <h3 className="font-bold text-zinc-900 dark:text-white capitalize flex items-center gap-2">
                 {activeModal === "income" && <Plus className="h-4 w-4 text-emerald-500" />}
@@ -576,23 +595,14 @@ export const DashboardPage: React.FC = () => {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="p-6 space-y-4">
-              <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                You have triggered the form for <strong className="text-emerald-600 dark:text-emerald-400 capitalize">{activeModal === "income" ? "Income" : activeModal === "expense" ? "Expense" : "Transfer"}</strong>.
-              </p>
-              <div className="rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-4 space-y-2 transition-colors duration-200">
-                <span className="text-xs font-semibold text-emerald-650 dark:text-emerald-500 uppercase tracking-widest block">Coming Soon</span>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                  Interactive transaction input form and dynamic balance calculation will be implemented in the next feature phase (Milestone 3: Transaction Ledger).
-                </p>
-              </div>
-              <button
-                onClick={() => setActiveModal(null)}
-                className="w-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-sm text-zinc-800 dark:text-white font-semibold py-2.5 rounded-xl transition-all border border-zinc-200 dark:border-zinc-700/60 cursor-pointer"
-                data-testid="modal-close-button"
-              >
-                Close
-              </button>
+            <div className="p-6">
+              <TransactionForm
+                accounts={accounts}
+                categories={categories}
+                onSubmit={handleTransactionSubmit}
+                isSubmitting={isCreating}
+                defaultType={activeModal === "income" ? "Income" : activeModal === "expense" ? "Expense" : "Transfer"}
+              />
             </div>
           </div>
         </div>
