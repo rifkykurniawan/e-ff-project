@@ -135,19 +135,26 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting }
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
             Source Account
           </label>
-          <select
-            {...register("source_account_id")}
-            className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
-              errors.source_account_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
-            }`}
-          >
-            <option value="">Select source account...</option>
-            {accounts.map((acc) => (
-              <option key={acc.id} value={acc.id}>
-                {acc.name} (Rp {acc.balance.toLocaleString()})
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              {...register("source_account_id")}
+              className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                errors.source_account_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+              }`}
+            >
+              <option value="">Select source account...</option>
+              {accounts.map((acc) => (
+                <option key={acc.id} value={acc.id}>
+                  {acc.name} (Rp {acc.balance.toLocaleString()})
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
           {errors.source_account_id && <p className="mt-1 text-xs text-red-500">{errors.source_account_id.message}</p>}
         </div>
       )}
@@ -158,19 +165,26 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting }
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
             Destination Account
           </label>
-          <select
-            {...register("destination_account_id")}
-            className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
-              errors.destination_account_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
-            }`}
-          >
-            <option value="">Select destination account...</option>
-            {accounts.map((acc) => (
-              <option key={acc.id} value={acc.id}>
-                {acc.name} (Rp {acc.balance.toLocaleString()})
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              {...register("destination_account_id")}
+              className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                errors.destination_account_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+              }`}
+            >
+              <option value="">Select destination account...</option>
+              {accounts.map((acc) => (
+                <option key={acc.id} value={acc.id}>
+                  {acc.name} (Rp {acc.balance.toLocaleString()})
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
           {errors.destination_account_id && <p className="mt-1 text-xs text-red-500">{errors.destination_account_id.message}</p>}
         </div>
       )}
@@ -181,19 +195,26 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting }
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
             Category
           </label>
-          <select
-            {...register("category_id")}
-            className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
-              errors.category_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
-            }`}
-          >
-            <option value="">Select category...</option>
-            {filteredCategories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              {...register("category_id")}
+              className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                errors.category_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+              }`}
+            >
+              <option value="">Select category...</option>
+              {filteredCategories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
           {errors.category_id && <p className="mt-1 text-xs text-red-500">{errors.category_id.message}</p>}
         </div>
       )}

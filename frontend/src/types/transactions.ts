@@ -11,25 +11,81 @@ export const transactionSchema = z.object({
   destination_account_id: z.preprocess((val) => (val === "" ? null : val), z.string().uuid("Invalid destination account").nullable().optional()),
   category_id: z.preprocess((val) => (val === "" ? null : val), z.string().uuid("Invalid category").nullable().optional()),
   notes: z.string().optional().nullable(),
-}).refine((data) => {
+}).superRefine((data, ctx) => {
   if (data.type === "Income") {
-    return !!data.destination_account_id && !data.source_account_id && !!data.category_id;
+    if (!data.destination_account_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Destination account is required for Income",
+        path: ["destination_account_id"],
+      });
+    }
+    if (data.source_account_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Source account must be empty for Income",
+        path: ["source_account_id"],
+      });
+    }
+    if (!data.category_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Category is required for Income",
+        path: ["category_id"],
+      });
+    }
+  } else if (data.type === "Expense") {
+    if (!data.source_account_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Source account is required for Expense",
+        path: ["source_account_id"],
+      });
+    }
+    if (data.destination_account_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Destination account must be empty for Expense",
+        path: ["destination_account_id"],
+      });
+    }
+    if (!data.category_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Category is required for Expense",
+        path: ["category_id"],
+      });
+    }
+  } else if (data.type === "Transfer") {
+    if (!data.source_account_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Source account is required for Transfer",
+        path: ["source_account_id"],
+      });
+    }
+    if (!data.destination_account_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Destination account is required for Transfer",
+        path: ["destination_account_id"],
+      });
+    }
+    if (data.source_account_id && data.destination_account_id && data.source_account_id === data.destination_account_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Source and destination accounts must be different",
+        path: ["destination_account_id"],
+      });
+    }
+    if (data.category_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Category must be empty for Transfer",
+        path: ["category_id"],
+      });
+    }
   }
-  if (data.type === "Expense") {
-    return !!data.source_account_id && !data.destination_account_id && !!data.category_id;
-  }
-  if (data.type === "Transfer") {
-    return (
-      !!data.source_account_id &&
-      !!data.destination_account_id &&
-      data.source_account_id !== data.destination_account_id &&
-      !data.category_id
-    );
-  }
-  return true;
-}, {
-  message: "Invalid transaction fields for selected type.",
-  path: ["type"]
 });
 
 export type TransactionInput = z.infer<typeof transactionSchema>;
