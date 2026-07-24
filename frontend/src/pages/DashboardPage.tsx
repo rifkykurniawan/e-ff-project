@@ -22,7 +22,9 @@ import {
   Sparkles,
   PieChart,
   Sun,
-  Moon
+  Moon,
+  Eye,
+  EyeOff
 } from "lucide-react";
 
 export const DashboardPage: React.FC = () => {
@@ -34,6 +36,19 @@ export const DashboardPage: React.FC = () => {
   const { accounts } = useAccounts();
   const { categories } = useCategories();
   const { createTransaction, isCreating } = useTransactions();
+
+  const [showBalances, setShowBalances] = useState<boolean>(() => {
+    const saved = localStorage.getItem("show_balances");
+    return saved !== "false";
+  });
+
+  const toggleShowBalances = () => {
+    setShowBalances((prev) => {
+      const next = !prev;
+      localStorage.setItem("show_balances", String(next));
+      return next;
+    });
+  };
 
   // Quick Action Modal State
   const [activeModal, setActiveModal] = useState<"income" | "expense" | "transfer" | null>(null);
@@ -50,6 +65,10 @@ export const DashboardPage: React.FC = () => {
       currency: "IDR",
       minimumFractionDigits: 0
     }).format(val);
+  };
+
+  const formatAmount = (val: number) => {
+    return showBalances ? formatCurrency(val) : "Rp ••••••";
   };
 
   if (isLoading) {
@@ -139,6 +158,16 @@ export const DashboardPage: React.FC = () => {
             <span className="text-xs text-zinc-500">{user?.email}</span>
           </div>
 
+          {/* Hide/Show Balances Toggle */}
+          <button
+            onClick={toggleShowBalances}
+            className="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 text-zinc-600 dark:text-zinc-300 transition-colors border border-zinc-200 dark:border-zinc-700"
+            title={showBalances ? "Hide Balances" : "Show Balances"}
+            data-testid="balance-visibility-toggle"
+          >
+            {showBalances ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+
           {/* Theme Switcher Button */}
           <button
             onClick={toggleTheme}
@@ -203,7 +232,7 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <p className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
-                {formatCurrency(dashboardData.total_balance)}
+                {formatAmount(dashboardData.total_balance)}
               </p>
               <p className="text-xs text-zinc-450 dark:text-zinc-500">Across all accounts</p>
             </div>
@@ -219,7 +248,7 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <p className="text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
-                {formatCurrency(dashboardData.income_this_month)}
+                {formatAmount(dashboardData.income_this_month)}
               </p>
               <p className="text-xs text-zinc-450 dark:text-zinc-500">Recorded since start of month</p>
             </div>
@@ -235,7 +264,7 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <p className="text-2xl font-bold tracking-tight text-rose-650 dark:text-rose-400">
-                {formatCurrency(dashboardData.expense_this_month)}
+                {formatAmount(dashboardData.expense_this_month)}
               </p>
               <p className="text-xs text-zinc-450 dark:text-zinc-500">Recorded since start of month</p>
             </div>
@@ -251,7 +280,7 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="space-y-1">
               <p className={`text-2xl font-bold tracking-tight ${dashboardData.net_balance >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-                {formatCurrency(dashboardData.net_balance)}
+                {formatAmount(dashboardData.net_balance)}
               </p>
               <p className="text-xs text-zinc-450 dark:text-zinc-500">Income minus expenses</p>
             </div>
@@ -324,7 +353,7 @@ export const DashboardPage: React.FC = () => {
                   <div className="absolute flex flex-col items-center justify-center text-center p-4">
                     <span className="text-[10px] text-zinc-550 dark:text-zinc-500 font-bold uppercase tracking-widest">Net Value</span>
                     <span className="text-sm font-extrabold text-zinc-900 dark:text-white leading-tight mt-0.5">
-                      {formatCurrency(dashboardData.net_balance)}
+                      {formatAmount(dashboardData.net_balance)}
                     </span>
                   </div>
                 </div>
@@ -337,7 +366,7 @@ export const DashboardPage: React.FC = () => {
                       <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Total Balance</span>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-bold text-zinc-900 dark:text-white">{formatCurrency(dashboardData.total_balance)}</p>
+                      <p className="text-xs font-bold text-zinc-900 dark:text-white">{formatAmount(dashboardData.total_balance)}</p>
                       <p className="text-[10px] text-zinc-500">{balancePercent.toFixed(1)}%</p>
                     </div>
                   </div>
@@ -348,7 +377,7 @@ export const DashboardPage: React.FC = () => {
                       <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Income</span>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(dashboardData.income_this_month)}</p>
+                      <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{formatAmount(dashboardData.income_this_month)}</p>
                       <p className="text-[10px] text-zinc-500">{incomePercent.toFixed(1)}%</p>
                     </div>
                   </div>
@@ -359,8 +388,8 @@ export const DashboardPage: React.FC = () => {
                       <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Expense</span>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-bold text-rose-600 dark:text-rose-400">{formatCurrency(dashboardData.expense_this_month)}</p>
-                      <p className="text-[10px] text-zinc-500">{expensePercent.toFixed(1)}%</p>
+                      <p className="text-xs font-bold text-rose-600 dark:text-rose-400">{formatAmount(dashboardData.expense_this_month)}</p>
+                      <p className="text-[10px] text-zinc-550">{expensePercent.toFixed(1)}%</p>
                     </div>
                   </div>
                 </div>
@@ -389,21 +418,21 @@ export const DashboardPage: React.FC = () => {
                         <div className="flex justify-between items-center text-sm">
                           <span className="font-medium text-zinc-800 dark:text-zinc-200">{budget.category_name}</span>
                           <span className="text-zinc-500 dark:text-zinc-400">
-                            {formatCurrency(budget.actual)} <span className="text-zinc-400 dark:text-zinc-650">/ {formatCurrency(budget.planned)}</span>
+                            {formatAmount(budget.actual)} <span className="text-zinc-400 dark:text-zinc-650">/ {formatAmount(budget.planned)}</span>
                           </span>
                         </div>
                         {/* Progress Bar Container */}
                         <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden transition-colors duration-200">
                           <div
-                            className={`h-full rounded-full transition-all duration-500 ${isOver ? "bg-rose-500" : "bg-emerald-555"}`}
+                            className={`h-full rounded-full transition-all duration-500 ${isOver ? "bg-rose-500" : "bg-emerald-500"}`}
                             style={{ width: `${percent}%` }}
                           ></div>
                         </div>
                         <div className="flex justify-between items-center text-xs">
                           {isOver ? (
-                            <span className="text-rose-600 dark:text-rose-400 font-medium">Over budget by {formatCurrency(Math.abs(budget.remaining))}</span>
+                            <span className="text-rose-600 dark:text-rose-400 font-medium">Over budget by {formatAmount(Math.abs(budget.remaining))}</span>
                           ) : (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Remaining {formatCurrency(budget.remaining)}</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Remaining {formatAmount(budget.remaining)}</span>
                           )}
                           <span className="text-zinc-500">{percent.toFixed(0)}% used</span>
                         </div>
@@ -474,7 +503,7 @@ export const DashboardPage: React.FC = () => {
                               : "text-blue-600 dark:text-blue-400"
                           }`}>
                             {tx.type === "Expense" ? "-" : tx.type === "Income" ? "+" : ""}
-                            {formatCurrency(tx.amount)}
+                            {formatAmount(tx.amount)}
                           </td>
                         </tr>
                       ))
