@@ -1,6 +1,6 @@
 # Family Finance
 
-Family Finance is a modern, personal finance management web application designed for a single family to collaboratively track income, expenses, budgets, and saving goals.
+Family Finance is a modern, personal finance management web application designed for a single family to track income, expenses, budgets, and saving goals with complete user data isolation (one account manages one dataset).
 
 ![Family Finance Dashboard](docs/ss.jpg)
 
@@ -31,11 +31,13 @@ E-FF/
 │   │   ├── services/         # Supabase client and query services
 │   │   ├── types/            # TypeScript definitions
 │   │   └── utils/            # Helper functions
+│   └── package.json
 ├── docs/                     # Technical specifications docs
 │   ├── requirements.md       # Software Requirement Specification
 │   ├── database.md           # Database Design
 │   ├── ui-guideline.md       # Visual Guidelines
-│   └── roadmap.md            # Development Milestones
+│   ├── roadmap.md            # Development Milestones
+│   └── migration_signup.sql  # Database migration for user signup & RLS
 ├── .env.example              # Development environment variables template
 └── README.md                 # Project Overview (This file)
 ```
@@ -56,7 +58,10 @@ Ensure you have the following installed:
    ```
 2. Fill in the `.env` variables using your Supabase project credentials (URL and Anon Key).
 
-### 3. Local Development
+### 3. Database Setup (Supabase)
+Before running the application, make sure to execute the SQL DDL statements located in [migration_signup.sql](file:///Users/rifkykurniawan/Documents/WORK%21%21/Project/E-FF/docs/migration_signup.sql) in your **Supabase SQL Editor** to set up table partitioning, Row Level Security (RLS) policies, and auth profile triggers.
+
+### 4. Local Development
 1. Navigate to the frontend directory:
    ```bash
    cd frontend

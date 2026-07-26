@@ -87,7 +87,9 @@ Stores authenticated family members. In Supabase, the core authentication is han
 | :--- | :--- | :--- | :--- |
 | `id` | `UUID` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | Unique identifier for each family member (maps to `auth.users.id`). |
 | `email` | `VARCHAR(255)` | `UNIQUE`, `NOT NULL` | Login email identifier. |
-| `user_metadata` | `JSONB` | `NULL` | Stores `first_name` and `last_name`. |
+| `first_name` | `VARCHAR(100)` | `NOT NULL` | First name of the user. |
+| `last_name` | `VARCHAR(100)` | `NOT NULL` | Last name of the user. |
+| `is_verified` | `BOOLEAN` | `NOT NULL`, `DEFAULT false` | Flag indicating whether the account has been verified/approved. |
 | `created_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Timestamp when user was created. |
 | `updated_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Timestamp when user was last updated. |
 
@@ -96,22 +98,25 @@ Stores authenticated family members. In Supabase, the core authentication is han
 ### Row Level Security (RLS)
 Since we are using Supabase directly from the frontend, **Row Level Security (RLS)** is mandatory.
 - All tables must have RLS enabled: `ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;`
-- A general policy for this single-family application is to allow access to all authenticated users:
-  `CREATE POLICY "Allow full access to authenticated users" ON table_name FOR ALL USING (auth.role() = 'authenticated');`
+- A user isolation policy ensures that users can only view and manage their own financial data:
+  `CREATE POLICY "Allow users access to their own data" ON table_name FOR ALL USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());`
 
 ---
 
 ### 2.2. `accounts` Table
-Tracks family accounts (bank accounts, e-wallets, cash, savings, etc.) and their current balances.
+Tracks user accounts (bank accounts, e-wallets, cash, savings, etc.) and their current balances.
 
 | Column Name | Data Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | `UUID` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | Unique identifier for the account. |
-| `name` | `VARCHAR(100)` | `NOT NULL`, `UNIQUE` | Human-readable name (e.g., "Dad's BCA", "Family Cash"). |
+| `user_id` | `UUID` | `NOT NULL`, `FOREIGN KEY` references `auth.users(id) ON DELETE CASCADE DEFAULT auth.uid()` | Owner of the account. |
+| `name` | `VARCHAR(100)` | `NOT NULL` | Human-readable name (e.g., "BCA", "Cash"). |
 | `type` | `VARCHAR(50)` | `NOT NULL`, `CHECK (type IN ('Cash', 'Bank', 'E-Wallet', 'Savings', 'Investment'))` | Type classification of the account. |
 | `balance` | `NUMERIC(15, 2)` | `NOT NULL`, `DEFAULT 0.00` | Current balance tracking. |
 | `created_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Timestamp of creation. |
 | `updated_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Timestamp of last modification. |
+
+*Unique Constraint:* `UNIQUE (user_id, name)` to prevent duplicate account names for the same user.
 
 ---
 
@@ -121,12 +126,13 @@ User-defined categories for grouping income and expenses.
 | Column Name | Data Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | `UUID` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | Unique identifier for the category. |
+| `user_id` | `UUID` | `NOT NULL`, `FOREIGN KEY` references `auth.users(id) ON DELETE CASCADE DEFAULT auth.uid()` | Owner of the category. |
 | `name` | `VARCHAR(100)` | `NOT NULL` | Name of the category (e.g., "Groceries", "Salary"). |
 | `type` | `VARCHAR(50)` | `NOT NULL`, `CHECK (type IN ('Income', 'Expense'))` | Category classification. |
 | `created_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Timestamp of creation. |
 | `updated_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Timestamp of last modification. |
 
-*Unique Constraint:* `UNIQUE (name, type)` to prevent duplicate naming within the same category type.
+*Unique Constraint:* `UNIQUE (user_id, name, type)` to prevent duplicate naming within the same category type for the same user.
 
 ---
 
@@ -136,6 +142,7 @@ Logs all financial operations: Incomes, Expenses, and Transfers.
 | Column Name | Data Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | `UUID` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | Unique identifier for the transaction. |
+| `user_id` | `UUID` | `NOT NULL`, `FOREIGN KEY` references `auth.users(id) ON DELETE CASCADE DEFAULT auth.uid()` | Owner of the transaction. |
 | `description` | `VARCHAR(255)` | `NOT NULL` | Description of the transaction. |
 | `amount` | `NUMERIC(15, 2)` | `NOT NULL`, `CHECK (amount > 0)` | Monitored transaction value (always positive). |
 | `type` | `VARCHAR(50)` | `NOT NULL`, `CHECK (type IN ('Income', 'Expense', 'Transfer'))` | Transaction type. |
@@ -150,11 +157,12 @@ Logs all financial operations: Incomes, Expenses, and Transfers.
 ---
 
 ### 2.5. `saving_goals` Table
-Tracks specific target saving goals defined by the family.
+Tracks specific target saving goals defined by the user.
 
 | Column Name | Data Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | `UUID` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | Unique identifier for the saving goal. |
+| `user_id` | `UUID` | `NOT NULL`, `FOREIGN KEY` references `auth.users(id) ON DELETE CASCADE DEFAULT auth.uid()` | Owner of the saving goal. |
 | `name` | `VARCHAR(100)` | `NOT NULL` | Saving goal title (e.g., "Japan Trip 2027"). |
 | `target_amount` | `NUMERIC(15, 2)` | `NOT NULL`, `CHECK (target_amount > 0)` | Target amount of money to save. |
 | `current_amount` | `NUMERIC(15, 2)` | `NOT NULL`, `DEFAULT 0.00`, `CHECK (current_amount >= 0)` | Saved amount so far. |
@@ -171,6 +179,7 @@ Defines spending limits for a specific category during a calendar month.
 | Column Name | Data Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | `UUID` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | Unique identifier for the budget entry. |
+| `user_id` | `UUID` | `NOT NULL`, `FOREIGN KEY` references `auth.users(id) ON DELETE CASCADE DEFAULT auth.uid()` | Owner of the budget limit. |
 | `category_id` | `UUID` | `NOT NULL`, `FOREIGN KEY` references `categories(id)` on delete cascade | Category bound to this budget limit. |
 | `year` | `INTEGER` | `NOT NULL` | Calendar year (e.g., 2026). |
 | `month` | `INTEGER` | `NOT NULL`, `CHECK (month BETWEEN 1 AND 12)` | Calendar month (1 = Jan, 12 = Dec). |
@@ -178,7 +187,7 @@ Defines spending limits for a specific category during a calendar month.
 | `created_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Timestamp of budget setup. |
 | `updated_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | Timestamp of last modification. |
 
-*Unique Constraint:* `UNIQUE (category_id, year, month)` to prevent multiple budgets for the same category in the same month.
+*Unique Constraint:* `UNIQUE (user_id, category_id, year, month)` to prevent multiple budgets for the same category in the same month for the same user.
 
 ---
 

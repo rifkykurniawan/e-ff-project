@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, type ReactNode } from "react";
-import type { UserResponse, LoginCredentials } from "../types/auth";
+import { useQueryClient } from "@tanstack/react-query";
+import type { UserResponse, LoginCredentials, SignUpCredentials } from "../types/auth";
 import { authService } from "../services/authService";
 import { supabase } from "../services/supabaseClient";
 
@@ -8,6 +9,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
+  signUp: (credentials: SignUpCredentials) => Promise<void>;
   logout: () => void;
 }
 
@@ -15,6 +17,8 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserResponse | null>(null);
+  const queryClient = useQueryClient();
+
   const [loading, setLoading] = useState<boolean>(true);
 
   // Initialize and listen for Supabase auth state changes
@@ -41,19 +45,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (session && session.user) {
-          // Try fetching from table 'users' (atau sesuaikan dengan nama tabel Anda)
-          const { data: profile } = await supabase
+           const { data: profile } = await supabase
             .from("users")
-            .select("first_name, last_name")
+            .select("first_name, last_name, is_verified")
             .eq("id", session.user.id)
             .single();
-
-          setUser({
-            id: session.user.id,
-            email: session.user.email || "",
-            first_name: profile?.first_name || session.user.user_metadata?.first_name || "Family",
-            last_name: profile?.last_name || session.user.user_metadata?.last_name || "",
-          });
+ 
+          if (!profile || !profile.is_verified) {
+            await supabase.auth.signOut();
+            setUser(null);
+          } else {
+            setUser({
+              id: session.user.id,
+              email: session.user.email || "",
+              first_name: profile.first_name,
+              last_name: profile.last_name,
+              email_confirmed: !!session.user.email_confirmed_at,
+              is_verified: profile.is_verified,
+            });
+          }
         } else {
           setUser(null);
         }
@@ -103,9 +113,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await authService.login(credentials);
       if (response.success && response.data) {
+        queryClient.clear();
         setUser(response.data.user);
       } else {
         throw new Error(response.message || "Login failed");
+      }
+    } catch (error) {
+      setUser(null);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signUp = async (credentials: SignUpCredentials) => {
+    setLoading(true);
+    try {
+      const response = await authService.signUp(credentials);
+      if (response.success && response.data) {
+        queryClient.clear();
+        setUser(response.data);
+      } else {
+        throw new Error(response.message || "Sign up failed");
       }
     } catch (error) {
       setUser(null);
@@ -119,6 +148,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(true);
     try {
       await authService.logout();
+      queryClient.clear();
       setUser(null);
     } catch (error) {
       console.error("Logout failed:", error);
@@ -132,6 +162,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     isAuthenticated: !!user,
     loading,
     login,
+    signUp,
     logout,
   };
 

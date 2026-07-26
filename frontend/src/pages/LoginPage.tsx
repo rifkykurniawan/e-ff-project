@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Wallet, Sun, Moon } from "lucide-react";
 import { useTheme } from "../components/ThemeContext";
 
@@ -58,10 +58,10 @@ export const LoginPage: React.FC = () => {
             <Wallet className="h-6 w-6" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
-            Family Finance
+            E - Finance
           </h2>
           <p className="mt-2 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            Sign in to manage your family's finances
+            Sign in to manage your finances
           </p>
         </div>
 
@@ -127,6 +127,13 @@ export const LoginPage: React.FC = () => {
                 "Sign In"
               )}
             </button>
+          </div>
+
+          <div className="text-center text-sm text-zinc-600 dark:text-zinc-400 mt-4">
+            Don't have an account?{" "}
+            <Link to="/signup" className="font-semibold text-emerald-600 hover:text-emerald-500 transition-colors">
+              Sign Up
+            </Link>
           </div>
         </form>
       </div>

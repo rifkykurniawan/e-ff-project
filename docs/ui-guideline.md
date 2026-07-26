@@ -40,7 +40,7 @@ A premium dark/light adaptive slate-and-emerald palette focused on financial cla
 ## 2. Layout & Navigation
 
 ### 2.1. Responsive Rules
-- **Mobile First Viewport**: Below `768px` (`md` breakpoint), the navigation shifts from a permanent left Sidebar to a bottom Nav Bar or collapsible Drawer sheet.
+- **Mobile Viewport**: Below `640px` (`sm` breakpoint), the navigation converts into a collapsible mobile drawer menu toggled by a hamburger button on the sticky header.
 - **Grid Layout Rules**:
   - Mobile: Single column.
   - Tablet (`md`): 2 columns.
@@ -48,7 +48,7 @@ A premium dark/light adaptive slate-and-emerald palette focused on financial cla
 
 ### 2.2. Dashboard Sidebar (Desktop)
 A clean vertical sidebar containing:
-1. **Brand Header**: "Family Finance" (Logo + Small icon).
+1. **Brand Header**: "Finance" (Logo + Wallet icon).
 2. **Navigation Items**:
    - Dashboard (`/`)
    - Accounts (`/accounts`)
@@ -57,14 +57,12 @@ A clean vertical sidebar containing:
    - Budgets (`/budgets`)
    - Saving Goals (`/saving-goals`)
    - Reports (`/reports`)
-3. **Footer**: User profile capsule (Email, Log Out button).
+3. **Footer**: Sign Out button.
 
-### 2.3. Navigation Bar (Mobile / Tablet)
-- Fixed bottom sticky bar containing high-frequency icons:
-  - Home (Dashboard)
-  - Plus Icon (Opens "Quick Transaction" Drawer)
-  - Transactions list
-  - Settings (Menu for Accounts, Categories, Saving Goals, Log Out).
+### 2.3. Mobile Navigation Drawer
+- Toggled via a hamburger menu icon in the sticky top header on mobile.
+- Opens from the left as an overlay drawer with a semi-transparent backdrop backdrop-blur overlay.
+- Automatically closes upon clicking the backdrop, close button (`X` icon), selecting any navigation link, or signing out.
 
 ---
 

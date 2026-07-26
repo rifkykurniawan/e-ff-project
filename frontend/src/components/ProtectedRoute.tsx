@@ -1,9 +1,10 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { Mail, RefreshCw, LogOut } from "lucide-react";
 
 export const ProtectedRoute: React.FC = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading, logout } = useAuth();
 
   if (loading) {
     return (

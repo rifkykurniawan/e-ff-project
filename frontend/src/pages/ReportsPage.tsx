@@ -122,6 +122,16 @@ export function ReportsPage() {
               </svg>
             </div>
           </div>
+
+          {/* Export Buttons */}
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button
+              onClick={() => handleExport("pdf")}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 px-3.5 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 cursor-pointer"
+            >
+              <FileText className="h-4 w-4 text-red-650 dark:text-red-500" /> Export PDF
+            </button>
+          </div>
         </div>
       </div>
 
@@ -302,27 +312,7 @@ export function ReportsPage() {
             </div>
           </div>
 
-          {/* Export Action Card */}
-          <div className="bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h3 className="font-bold text-zinc-900 dark:text-white">Export Monthly Data</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Generate spreadsheet or document versions of this monthly summary.</p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleExport("excel")}
-                className="flex items-center gap-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 px-3.5 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 cursor-pointer"
-              >
-                <FileSpreadsheet className="h-4 w-4 text-emerald-600 dark:text-emerald-500" /> Export Excel
-              </button>
-              <button
-                onClick={() => handleExport("pdf")}
-                className="flex items-center gap-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 px-3.5 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 cursor-pointer"
-              >
-                <FileText className="h-4 w-4 text-red-650 dark:text-red-500" /> Export PDF
-              </button>
-            </div>
-          </div>
+
         </>
       )}
     </div>

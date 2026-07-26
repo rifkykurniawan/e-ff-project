@@ -3,6 +3,8 @@ export interface UserResponse {
   email: string;
   first_name: string;
   last_name: string;
+  email_confirmed?: boolean;
+  is_verified?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -24,3 +26,11 @@ export interface LoginCredentials {
   email: string;
   password: string;
 }
+
+export interface SignUpCredentials {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+}
+

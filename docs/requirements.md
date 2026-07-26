@@ -1,15 +1,14 @@
 # Software Requirement Specification (SRS) - Family Finance
 
 ## 1. Project Overview
-**Family Finance** is a modern, production-ready personal finance management web application designed for a single family. It is specifically built to help family members collaboratively track their income, expenses, transfers, monthly budgets, and savings goals. 
+**Family Finance** is a modern, production-ready personal finance management web application designed for a single family. It allows family members to sign up and manage their own financial datasets.
 
-Unlike typical personal finance apps, Family Finance is **not a Software-as-a-Service (SaaS) application**. It is deployed as a private, single-instance installation for one family, meaning there is no multi-tenancy, no subscription billing, and no complex role-based access control. All family members share the same privileges to promote transparency and collaborative budgeting.
+Each registered user has complete data isolation—meaning 1 account corresponds to exactly 1 distinct set of accounts, categories, transactions, budgets, and saving goals. Access control is enforced at the database level using Row Level Security (RLS) policies.
 
 ---
 
 ## 2. Project Goals
-- **Promote Financial Transparency**: Enable all family members to view the family’s complete financial picture.
-- **Collaborative Budgeting**: Allow family members to set monthly budgets by category and track joint expenses.
+- **Personalized Finance Scoping**: Ensure each user manages their own isolated finance space.
 - **Goal Tracking**: Establish saving goals and automatically track savings progress.
 - **Comprehensive Reporting**: Provide clear visualizations of income versus expenses, spending trends by category, and yearly summaries.
 - **Simplicity & Reliability**: Deliver a clean, minimal user experience using a solid, maintainable tech stack without unnecessary enterprise overhead.
@@ -19,10 +18,12 @@ Unlike typical personal finance apps, Family Finance is **not a Software-as-a-Se
 ## 3. Functional Requirements
 
 ### 3.1. Authentication & Session Management
-- **User Login**: Users must be able to log in securely using an email address and password.
+- **User Registration (Sign Up)**: Anyone can register an account by providing first name, last name, email, and password.
+- **Administrator Approval (Verification)**: Newly registered users are unverified by default. The only way to verify/activate an account is by updating the `is_verified` flag directly in the database. Only verified accounts are allowed to log in and restore sessions.
+- **User Login**: Users must be able to log in securely using an email address and password once approved.
 - **JWT-Based Sessions**: Sessions must be authenticated using JSON Web Tokens (JWT) stored securely.
-- **Protected Routes**: All pages and API endpoints (except login) must require valid JWT authentication.
-- **No Roles/Permissions**: Every authenticated user possesses identical privileges (read, create, edit, delete). No admin panel or permission management is required.
+- **Protected Routes**: All pages and API endpoints (except login and signup) must require valid JWT authentication.
+- **No Roles/Permissions**: Every verified user possesses identical privileges (read, create, edit, delete) over their own data. No admin panel or permission management is required.
 
 ### 3.2. Account Management
 - **Multiple Accounts**: Users can create, update, and soft-delete (or delete if clean) an unlimited number of accounts.
@@ -84,22 +85,22 @@ Unlike typical personal finance apps, Family Finance is **not a Software-as-a-Se
 ## 4. Non-Functional Requirements
 
 ### 4.1. Security
-- **Password Hashing**: Passwords must be hashed using a secure hashing algorithm (e.g., bcrypt/Argon2) before storage. Plain text passwords must never be stored or logged.
-- **Token Security**: JWTs must expire and be validated on every request.
-- **Data Protection**: API responses must never expose sensitive info (e.g., hashed passwords).
+- **Auth Provider**: Managed fully via Supabase Auth (GoTrue API).
+- **Password Security**: Passwords are securely hashed and stored within Supabase's internal auth schemas.
+- **Session Security**: Sessions are verified via JWT tokens automatically handled by the Supabase Client SDK and enforced at the database level using Row Level Security (RLS).
 
 ### 4.2. Usability & UI Design
-- **Responsive Layout**: The user interface must support desktop, tablet, and mobile browsers seamlessly.
+- **Responsive Layout**: The user interface supports desktop, tablet, and mobile browsers seamlessly. On mobile viewports, the sidebar converts into a collapsible mobile drawer menu toggled by a hamburger button.
 - **Modern & Minimalist**: Built using shadcn/ui components with a clean and minimal design system. Avoid unnecessary animations to keep the interface fast and functional.
 
 ### 4.3. Performance & Reliability
-- **Fast Load Times**: The SPA must be lightweight and load quickly over standard network connections.
-- **Validation**: Strict validation on both the Frontend (React Hook Form + Zod) and Backend (Pydantic v2). The system must never trust frontend input.
-- **Database integrity**: PostgreSQL database with foreign key constraints, using UUIDs for primary keys, and tracking `created_at` and `updated_at` timestamps on all tables.
+- **Fast Load Times**: The SPA is lightweight and loads quickly over standard network connections.
+- **Validation**: Strict validation on the Frontend (React Hook Form + Zod) and Database level (PostgreSQL check constraints, triggers, and foreign keys). The database rejects invalid actions as a second layer of defense.
+- **Database Integrity**: PostgreSQL database with foreign key constraints, using UUIDs for primary keys, and tracking `created_at` and `updated_at` timestamps on all tables.
 
 ### 4.4. Maintenance & Logging
-- **Structured Logging**: Backend application must use structured logging.
-- **Audit Trails**: Log critical operations such as application startup, user logins, and database write errors. Do not log passwords or authentication tokens.
+- **Database Logs**: Relies on Supabase Database logging features.
+- **Frontend Debugging Logs**: Client-side console logging is limited to debugging output and must never leak JWTs or passwords.
 
 ---
 
@@ -109,13 +110,13 @@ Unlike typical personal finance apps, Family Finance is **not a Software-as-a-Se
 ```mermaid
 sequenceDiagram
     actor User
-    participant Frontend
-    participant Backend
+    participant Frontend as React App (Supabase SDK)
+    participant Supabase as Supabase Auth
     User->>Frontend: Enter Email & Password
-    Frontend->>Backend: POST /api/v1/auth/login
-    Note over Backend: Validate credentials & generate JWT
-    Backend-->>Frontend: JWT Token + User Data
-    Frontend->>Frontend: Save Token to Secure Storage
+    Frontend->>Supabase: signInWithPassword({ email, password })
+    Note over Supabase: Validate credentials & generate session JWT
+    Supabase-->>Frontend: Auth Session (Access Token, User Metadata)
+    Frontend->>Frontend: Save Session (in localStorage)
     Frontend->>Frontend: Redirect to Dashboard Page
 ```
 
@@ -123,29 +124,30 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     actor User
-    participant Frontend
-    participant Backend
-    participant Database
+    participant Frontend as React App (Supabase SDK)
+    participant DB as Supabase Database
+    participant Triggers as PG Triggers
     User->>Frontend: Click "Add Transaction", Fill Form (Expense)
     Frontend->>Frontend: Validate input via Zod
-    Frontend->>Backend: POST /api/v1/transactions (Auth Header)
-    Note over Backend: Validate token & input data
-    Backend->>Database: Query account & category
-    Backend->>Database: Insert Transaction & Update Account Balance
-    Database-->>Backend: Success
-    Backend-->>Frontend: JSON Response { success: true, ... }
-    Frontend->>Frontend: Refetch state & update Dashboard
+    Frontend->>DB: INSERT INTO transactions (Auth Header)
+    Note over DB: Check RLS policy & Schema rules
+    DB->>Triggers: execute update_account_balance() trigger
+    Note over Triggers: Subtract amount from source account balance
+    Triggers-->>DB: Success
+    DB-->>Frontend: JSON Response { data: [...], error: null }
+    Frontend->>Frontend: Refetch state & update Dashboard UI
 ```
 
 ### 5.3. Managing a Saving Goal
 ```mermaid
 sequenceDiagram
     actor User
-    participant Frontend
-    participant Backend
+    participant Frontend as React App (Supabase SDK)
+    participant DB as Supabase Database
     User->>Frontend: Navigate to Saving Goals, Click "New Goal"
-    Frontend->>Backend: POST /api/v1/saving-goals (Auth Header)
-    Backend-->>Frontend: Success Response
+    Frontend->>DB: INSERT INTO saving_goals (Auth Header)
+    Note over DB: Check RLS policy & Schema rules
+    DB-->>Frontend: JSON Response { data: [...], error: null }
     Frontend->>Frontend: Update goals list and progress metrics
 ```
 
@@ -163,9 +165,9 @@ sequenceDiagram
 ---
 
 ## 7. Assumptions
-- **Single Instance Deployment**: The app runs on a single Railway/Vercel instance with a single PostgreSQL database server. No horizontal scaling or region synchronization is required.
+- **Single Instance Deployment**: The app runs on a single Vercel instance connected to a single Supabase PostgreSQL database server. No horizontal scaling or region synchronization is required.
 - **Family Trust**: Since all members have identical access levels, it is assumed that family members will not intentionally delete or alter other members' transactions maliciously.
-- **Manual Backups**: Database backup and restore operations are handled at the database provider level (e.g., Railway/PostgreSQL hosting tools) rather than inside the app.
+- **Manual Backups**: Database backup and restore operations are handled at the database provider level (e.g., Supabase dashboard tools) rather than inside the app.
 
 ---
 
@@ -178,7 +180,7 @@ sequenceDiagram
 ---
 
 ## 9. Feature List
-1. **Authentication Dashboard**: Login page, JWT token management, auto-logout on expiration.
+1. **Authentication Dashboard**: Login page, Supabase session management, auto-logout on expiration.
 2. **Account Center**: List accounts, add new accounts (Cash, Bank, E-Wallet, Savings, Investment), edit details, view individual account ledger.
 3. **Category Manager**: Add, edit, and delete custom categories, classified by Income or Expense.
 4. **Transaction Log**: Unified list of transactions with filtering (by type, account, date range, category) and search. Form to create/edit/delete Income, Expense, and Transfer transactions.
@@ -191,8 +193,8 @@ sequenceDiagram
 ## 10. Acceptance Criteria
 
 ### 10.1. Authentication
-- **AC 1**: User cannot view any dashboard, account, budget, or transaction data without a valid JWT token.
-- **AC 2**: Invalid login credentials must return a clear validation error without exposing details of the hashing mechanism.
+- **AC 1**: User cannot view any dashboard, account, budget, or transaction data without a valid Supabase session.
+- **AC 2**: Invalid login credentials must return a clear validation error from Supabase Auth.
 
 ### 10.3. Accounts
 - **AC 3**: Creating an account must require a non-empty name and a valid account type selection.
@@ -210,3 +212,4 @@ sequenceDiagram
 ### 10.6. Saving Goals
 - **AC 10**: The saving goal progress bar must accurately display the percentage of `Current Amount / Target Amount`.
 - **AC 11**: Editing a saving goal's current amount must update the calculated progress immediately.
+
