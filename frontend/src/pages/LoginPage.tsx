@@ -89,7 +89,7 @@ export const LoginPage: React.FC = () => {
               <CheckCircle2 className="h-5 w-5 text-[#248d61] dark:text-[#3cd395] shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-semibold text-[#0a271c] dark:text-white text-sm">100% Private</h4>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">Your data never leaves your instance.</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Relax! Your data never leaves your instance.</p>
               </div>
             </div>
             <div className="flex items-start gap-2.5">

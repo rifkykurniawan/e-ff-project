@@ -34,6 +34,11 @@ export function SavingGoalsPage() {
   const { categories } = useCategories();
   const { createTransaction, isCreating: isLoggingTransaction } = useTransactions();
 
+  // Local copies of addingSavingsGoal fields to avoid TS null narrowing issues in JSX
+  const addingGoalName = addingSavingsGoal?.name || "";
+  const addingGoalTarget = addingSavingsGoal?.target_amount ?? 0;
+  const addingGoalCurrent = addingSavingsGoal?.current_amount ?? 0;
+
   // Form for Set/Edit Goal
   const {
     register,
@@ -337,7 +342,7 @@ export function SavingGoalsPage() {
                 errors.name ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
               }`}
             />
-            {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
+            {errors.name?.message && <p className="mt-1 text-xs text-red-500">{errors.name?.message}</p>}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -354,7 +359,7 @@ export function SavingGoalsPage() {
                   errors.target_amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
                 }`}
               />
-              {errors.target_amount && <p className="mt-1 text-xs text-red-500">{errors.target_amount.message}</p>}
+              {errors.target_amount?.message && <p className="mt-1 text-xs text-red-500">{errors.target_amount?.message}</p>}
             </div>
 
             {/* Current Amount */}
@@ -370,7 +375,7 @@ export function SavingGoalsPage() {
                   errors.current_amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
                 }`}
               />
-              {errors.current_amount && <p className="mt-1 text-xs text-red-500">{errors.current_amount.message}</p>}
+              {errors.current_amount?.message && <p className="mt-1 text-xs text-red-500">{errors.current_amount?.message}</p>}
             </div>
           </div>
 
@@ -386,7 +391,7 @@ export function SavingGoalsPage() {
                 errors.target_date ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
               }`}
             />
-            {errors.target_date && <p className="mt-1 text-xs text-red-500">{errors.target_date.message}</p>}
+            {errors.target_date?.message && <p className="mt-1 text-xs text-red-500">{errors.target_date?.message}</p>}
           </div>
 
           {/* Notes */}
@@ -418,7 +423,7 @@ export function SavingGoalsPage() {
       <Modal
         isOpen={addingSavingsGoal !== null}
         onClose={handleCloseSavingsModal}
-        title={addingSavingsGoal ? `Add Savings to ${addingSavingsGoal.name}` : "Add Savings"}
+        title={addingSavingsGoal ? `Add Savings to ${addingGoalName}` : "Add Savings"}
       >
         <form onSubmit={handleSubmitSavings(onSavingsFormSubmit)} className="space-y-4">
           {/* Target Info */}
@@ -426,15 +431,15 @@ export function SavingGoalsPage() {
             <div className="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-505 dark:text-zinc-500 space-y-1">
               <div className="flex justify-between">
                 <span>Target Amount:</span>
-                <span className="font-semibold text-zinc-800 dark:text-zinc-200">{formatAmount(addingSavingsGoal.target_amount)}</span>
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">{formatAmount(addingGoalTarget)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Current Amount:</span>
-                <span className="font-semibold text-zinc-800 dark:text-zinc-200">{formatAmount(addingSavingsGoal.current_amount)}</span>
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">{formatAmount(addingGoalCurrent)}</span>
               </div>
               <div className="flex justify-between border-t border-zinc-200 dark:border-zinc-800 pt-1.5 mt-1 text-emerald-600 dark:text-emerald-400 font-medium">
                 <span>Remaining to Save:</span>
-                <span>{formatAmount(addingSavingsGoal.target_amount - addingSavingsGoal.current_amount)}</span>
+                <span>{formatAmount(addingGoalTarget - addingGoalCurrent)}</span>
               </div>
             </div>
           )}
@@ -452,7 +457,7 @@ export function SavingGoalsPage() {
                 savingsErrors.amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
               }`}
             />
-            {savingsErrors.amount && <p className="mt-1 text-xs text-red-500">{savingsErrors.amount.message}</p>}
+            {savingsErrors.amount?.message && <p className="mt-1 text-xs text-red-500">{savingsErrors.amount?.message}</p>}
           </div>
 
           {/* Source Account */}
@@ -480,7 +485,7 @@ export function SavingGoalsPage() {
                 </svg>
               </div>
             </div>
-            {savingsErrors.source_account_id && <p className="mt-1 text-xs text-red-500">{savingsErrors.source_account_id.message}</p>}
+             {savingsErrors.source_account_id?.message && <p className="mt-1 text-xs text-red-500">{savingsErrors.source_account_id?.message}</p>}
           </div>
 
           {/* Expense Category */}
@@ -508,7 +513,7 @@ export function SavingGoalsPage() {
                 </svg>
               </div>
             </div>
-            {savingsErrors.category_id && <p className="mt-1 text-xs text-red-500">{savingsErrors.category_id.message}</p>}
+             {savingsErrors.category_id?.message && <p className="mt-1 text-xs text-red-500">{savingsErrors.category_id?.message}</p>}
           </div>
 
           {/* Date */}
@@ -523,7 +528,7 @@ export function SavingGoalsPage() {
                 savingsErrors.date ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
               }`}
             />
-            {savingsErrors.date && <p className="mt-1 text-xs text-red-500">{savingsErrors.date.message}</p>}
+             {savingsErrors.date?.message && <p className="mt-1 text-xs text-red-500">{savingsErrors.date?.message}</p>}
           </div>
 
           {/* Submit */}
