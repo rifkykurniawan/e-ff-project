@@ -16,11 +16,14 @@ export const authService = {
       });
 
       if (error) {
+        const message = error.message === "Signups not allowed for this instance"
+          ? "Signups are currently not available. Please contact the administrator to create your account."
+          : error.message;
         return {
           success: false,
-          message: error.message,
+          message,
           data: null as any,
-          errors: { message: [error.message] },
+          errors: { message: [message] },
         };
       }
 

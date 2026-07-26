@@ -18,7 +18,8 @@ import {
   Plus,
   Minus,
   Sparkles,
-  PieChart
+  PieChart,
+  Activity
 } from "lucide-react";
 
 export const DashboardPage: React.FC = () => {
@@ -138,12 +139,28 @@ export const DashboardPage: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveModal("expense")}
-              className="flex items-center gap-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-250 dark:bg-zinc-800 dark:hover:bg-zinc-700 px-4 py-2.5 text-sm font-semibold text-zinc-700 dark:text-white transition-all active:scale-95 border border-zinc-200 dark:border-zinc-700 cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 px-4 py-2.5 text-sm font-semibold text-white transition-all shadow-md shadow-rose-950/20 active:scale-95 cursor-pointer"
               data-testid="hero-expense-button"
             >
               <Minus className="h-4 w-4" /> Expense
             </button>
           </div>
+        </div>
+
+        {/* Finance Health (Coming Soon) */}
+        <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 dark:from-emerald-500/5 dark:to-teal-500/5 border border-emerald-550/20 dark:border-emerald-500/10 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm relative overflow-hidden transition-colors duration-200">
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="bg-emerald-500/10 p-2.5 rounded-xl text-emerald-600 dark:text-[#3cd395]">
+              <Activity className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-zinc-900 dark:text-white text-sm sm:text-base">Financial Health Indicator</h3>
+              <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm">Analyze your spending habits, debt-to-income ratio, and overall financial safety rating.</p>
+            </div>
+          </div>
+          <span className="shrink-0 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider relative z-10">
+            Coming Soon
+          </span>
         </div>
 
         {/* Metrics Grid */}
@@ -449,30 +466,15 @@ export const DashboardPage: React.FC = () => {
                   <Target className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
                   <h2 className="text-lg font-bold tracking-tight">Saving Goals</h2>
                 </div>
+                <span className="bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-750 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Soon
+                </span>
               </div>
 
-              <div className="space-y-4">
-                {dashboardData.saving_goals.length === 0 ? (
-                  <p className="text-sm text-zinc-550 dark:text-zinc-500 text-center py-4">No saving goals defined yet.</p>
-                ) : (
-                  dashboardData.saving_goals.map((goal, idx) => (
-                    <div key={idx} className="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 space-y-2 transition-colors duration-200">
-                      <div className="flex justify-between items-start">
-                        <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{goal.name}</span>
-                        <span className="text-xs bg-emerald-550/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-bold">
-                          {goal.progress_percentage}%
-                        </span>
-                      </div>
-                      {/* Mini Progress Bar */}
-                      <div className="h-1.5 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden transition-colors duration-200">
-                        <div
-                          className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                          style={{ width: `${goal.progress_percentage}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  ))
-                )}
+              <div className="flex flex-col items-center justify-center text-center p-5 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950/20">
+                <Activity className="h-7 w-7 text-zinc-400 mb-2 animate-pulse" />
+                <p className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Feature Coming Soon</p>
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 max-w-[200px]">We are fine-tuning saving goal allocations.</p>
               </div>
             </div>
 

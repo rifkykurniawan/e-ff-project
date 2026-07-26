@@ -1,6 +1,21 @@
+import {
+  ArrowLeftRight,
+  BarChart3,
+  Eye,
+  EyeOff,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Moon,
+  PieChart,
+  PiggyBank,
+  Sun,
+  Tags,
+  Wallet,
+  X,
+} from "lucide-react";
 import { useState } from "react";
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Wallet, Tags, LogOut, ArrowLeftRight, PieChart, PiggyBank, Sun, Moon, Eye, EyeOff, BarChart3, Menu, X } from "lucide-react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../components/AuthContext";
 import { useTheme } from "../components/ThemeContext";
 
@@ -83,7 +98,7 @@ export function MainLayout() {
                     onClick={() => setIsSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isActive
-                        ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
+                        ? "bg-emerald-550/10 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
                         : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
                     }`}
                   >
@@ -95,7 +110,7 @@ export function MainLayout() {
             })}
           </ul>
         </div>
-        
+
         <div className="p-4 border-t border-zinc-200 dark:border-zinc-800">
           <button
             onClick={handleLogout}
@@ -123,10 +138,11 @@ export function MainLayout() {
             <div className="bg-emerald-500/10 p-2 rounded-lg">
               <Wallet className="h-5 w-5" />
             </div>
-            <span className="font-bold text-lg text-zinc-900 dark:text-white tracking-tight">Finance</span>
+            <span className="font-bold text-lg text-zinc-900 dark:text-white tracking-tight">
+              Finance
+            </span>
           </div>
           <div className="hidden sm:block"></div> {/* Spacer on desktop */}
-
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex flex-col text-right">
               <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
@@ -142,7 +158,11 @@ export function MainLayout() {
               title={showBalances ? "Hide Balances" : "Show Balances"}
               data-testid="balance-visibility-toggle"
             >
-              {showBalances ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showBalances ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
             </button>
 
             {/* Theme Switcher Button */}
@@ -152,7 +172,11 @@ export function MainLayout() {
               title="Change Theme"
               data-testid="theme-toggle-button"
             >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
             </button>
 
             <button

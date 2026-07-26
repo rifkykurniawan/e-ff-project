@@ -178,6 +178,21 @@ export function SavingGoalsPage() {
   };
 
   return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl shadow-sm transition-colors duration-200">
+      <div className="bg-emerald-500/10 p-4 rounded-2xl text-emerald-650 dark:text-[#3cd395] mb-4 animate-pulse">
+        <PiggyBank className="h-10 w-10" />
+      </div>
+      <h2 className="text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Saving Goals</h2>
+      <p className="text-zinc-500 dark:text-zinc-400 mt-2 max-w-md text-sm sm:text-base">
+        This feature is currently under active construction. We are designing optimal contribution workflows and automatic balance allocation. Stay tuned!
+      </p>
+      <span className="mt-6 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
+        Coming Soon
+      </span>
+    </div>
+  );
+
+  return (
     <div>
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">

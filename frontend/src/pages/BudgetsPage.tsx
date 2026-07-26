@@ -39,7 +39,9 @@ export function BudgetsPage() {
     type: "Expense"
   });
 
-  const expenseCategories = categories.filter(c => c.type === "Expense");
+  const expenseCategories = categories
+    .filter(c => c.type === "Expense")
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   // Sum actual spending per category
   const actualSpendingMap = expenseCategories.reduce((acc, cat) => {
