@@ -11,12 +11,20 @@ import { useOutletContext } from "react-router-dom";
 export function TransactionsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth() + 1;
+  const defaultStartDate = `${year}-${String(month).padStart(2, "0")}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const defaultEndDate = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
   const [filters, setFilters] = useState({
     accountId: "",
     categoryId: "",
     type: "",
-    startDate: "",
-    endDate: "",
+    startDate: defaultStartDate,
+    endDate: defaultEndDate,
   });
   const { showBalances } = useOutletContext<{ showBalances: boolean }>();
 
@@ -85,8 +93,8 @@ export function TransactionsPage() {
       accountId: "",
       categoryId: "",
       type: "",
-      startDate: "",
-      endDate: "",
+      startDate: defaultStartDate,
+      endDate: defaultEndDate,
     });
   };
 

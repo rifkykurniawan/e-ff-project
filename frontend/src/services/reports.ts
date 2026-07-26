@@ -18,12 +18,11 @@ export const reportsService = {
       const endDate = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
 
       // Fetch all required data in parallel
-      const [accounts, savingGoals, budgets, currentMonthTransactions, allTransactions] = await Promise.all([
+      const [accounts, savingGoals, budgets, currentMonthTransactions] = await Promise.all([
         accountsService.getAccounts(),
         savingGoalsService.getSavingGoals(),
         budgetsService.getBudgets(year, month),
-        transactionsService.getTransactions({ startDate, endDate }),
-        transactionsService.getTransactions() // for recent transactions
+        transactionsService.getTransactions({ startDate, endDate })
       ]);
 
       // 1. Total Balance across all accounts
@@ -40,8 +39,8 @@ export const reportsService = {
 
       const net_balance = income_this_month - expense_this_month;
 
-      // 3. Recent Transactions (limit to 5)
-      const recent_transactions: DashboardTransaction[] = allTransactions
+      // 3. Recent Transactions (limit to 5 from current month)
+      const recent_transactions: DashboardTransaction[] = currentMonthTransactions
         .slice(0, 5)
         .map((t) => ({
           id: t.id,
