@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTransactions } from "../hooks/useTransactions";
 import { useOutletContext } from "react-router-dom";
-import { BarChart3, TrendingUp, TrendingDown, FileSpreadsheet, FileText, Wallet } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, FileText, Wallet } from "lucide-react";
 
 export function ReportsPage() {
   const currentDate = new Date();
