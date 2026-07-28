@@ -14,7 +14,7 @@ import { useOutletContext } from "react-router-dom";
 const addSavingsSchema = z.object({
   amount: z.coerce.number().positive("Amount must be greater than 0"),
   source_account_id: z.string().uuid("Please select a valid source account"),
-  category_id: z.string().uuid("Please select a valid category"),
+  category_id: z.string().uuid("Please select a valid category").optional().nullable(),
   date: z.string().min(1, "Date is required"),
 });
 type AddSavingsInput = z.infer<typeof addSavingsSchema>;
@@ -44,7 +44,8 @@ export function SavingGoalsPage() {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    watch
   } = useForm<SavingGoalInput>({
     resolver: zodResolver(savingGoalSchema) as any,
     defaultValues: {
@@ -53,8 +54,11 @@ export function SavingGoalsPage() {
       current_amount: 0,
       target_date: "",
       notes: "",
+      account_id: "",
     }
   });
+
+  const watchedAccountId = watch("account_id");
 
   // Form for Add Savings Modal
   const {
@@ -80,6 +84,7 @@ export function SavingGoalsPage() {
       current_amount: 0,
       target_date: "",
       notes: "",
+      account_id: "",
     });
     setIsModalOpen(true);
   };
@@ -92,6 +97,7 @@ export function SavingGoalsPage() {
       current_amount: goal.current_amount,
       target_date: goal.target_date || "",
       notes: goal.notes || "",
+      account_id: goal.account_id || "",
     });
     setIsModalOpen(true);
   };
@@ -130,22 +136,36 @@ export function SavingGoalsPage() {
     }
 
     try {
-      await updateSavingGoal({
-        id: addingSavingsGoal.id,
-        input: {
-          current_amount: potentialNewAmount
-        }
-      });
+      if (addingSavingsGoal.account_id) {
+        // If the saving goal has its own account, log a Transfer from source to the saving goal's account
+        await createTransaction({
+          description: `Savings: ${addingSavingsGoal.name}`,
+          amount: data.amount,
+          type: "Transfer",
+          date: data.date,
+          source_account_id: data.source_account_id,
+          destination_account_id: addingSavingsGoal.account_id,
+          notes: `Savings contribution to goal "${addingSavingsGoal.name}"`
+        });
+      } else {
+        // Fallback: update saving goal directly and log as Expense
+        await updateSavingGoal({
+          id: addingSavingsGoal.id,
+          input: {
+            current_amount: potentialNewAmount
+          }
+        });
 
-      await createTransaction({
-        description: `Savings: ${addingSavingsGoal.name}`,
-        amount: data.amount,
-        type: "Expense",
-        date: data.date,
-        source_account_id: data.source_account_id,
-        category_id: data.category_id,
-        notes: `Savings contribution to goal "${addingSavingsGoal.name}"`
-      });
+        await createTransaction({
+          description: `Savings: ${addingSavingsGoal.name}`,
+          amount: data.amount,
+          type: "Expense",
+          date: data.date,
+          source_account_id: data.source_account_id,
+          category_id: data.category_id || undefined,
+          notes: `Savings contribution to goal "${addingSavingsGoal.name}"`
+        });
+      }
 
       handleCloseSavingsModal();
     } catch (err: any) {
@@ -182,20 +202,6 @@ export function SavingGoalsPage() {
     }
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl shadow-sm transition-colors duration-200">
-      <div className="bg-emerald-500/10 p-4 rounded-2xl text-emerald-650 dark:text-[#3cd395] mb-4 animate-pulse">
-        <PiggyBank className="h-10 w-10" />
-      </div>
-      <h2 className="text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Saving Goals</h2>
-      <p className="text-zinc-500 dark:text-zinc-400 mt-2 max-w-md text-sm sm:text-base">
-        This feature is currently under active construction. We are designing optimal contribution workflows and automatic balance allocation. Stay tuned!
-      </p>
-      <span className="mt-6 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
-        Coming Soon
-      </span>
-    </div>
-  );
 
   return (
     <div>
@@ -256,7 +262,14 @@ export function SavingGoalsPage() {
 
                 <div>
                   <div className="flex justify-between items-start mb-2 pr-12">
-                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white line-clamp-1">{goal.name}</h3>
+                    <div>
+                      <h3 className="text-lg font-bold text-zinc-900 dark:text-white line-clamp-1">{goal.name}</h3>
+                      {goal.accounts && (
+                        <span className="inline-block mt-1 text-xs font-medium text-emerald-600 dark:text-emerald-450 bg-emerald-500/10 px-2 py-0.5 rounded">
+                          Account: {goal.accounts.name}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {goal.target_date && (
@@ -345,6 +358,34 @@ export function SavingGoalsPage() {
             {errors.name?.message && <p className="mt-1 text-xs text-red-500">{errors.name?.message}</p>}
           </div>
 
+          {/* Associated Account */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+              Associated Account (e.g. BCA, BRI, Seabank)
+            </label>
+            <div className="relative">
+              <select
+                {...register("account_id")}
+                className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                  errors.account_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+                }`}
+              >
+                <option value="">No account (manual balance tracking)</option>
+                {accounts.map((acc) => (
+                  <option key={acc.id} value={acc.id}>
+                    {acc.name} ({acc.type}) - Rp {acc.balance.toLocaleString()}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+            {errors.account_id?.message && <p className="mt-1 text-xs text-red-500">{errors.account_id?.message}</p>}
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Target Amount */}
             <div>
@@ -363,20 +404,22 @@ export function SavingGoalsPage() {
             </div>
 
             {/* Current Amount */}
-            <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                Current Amount (Rp)
-              </label>
-              <input
-                type="number"
-                {...register("current_amount")}
-                placeholder="0"
-                className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
-                  errors.current_amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
-                }`}
-              />
-              {errors.current_amount?.message && <p className="mt-1 text-xs text-red-500">{errors.current_amount?.message}</p>}
-            </div>
+            {!watchedAccountId && (
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                  Current Amount (Rp)
+                </label>
+                <input
+                  type="number"
+                  {...register("current_amount")}
+                  placeholder="0"
+                  className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                    errors.current_amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+                  }`}
+                />
+                {errors.current_amount?.message && <p className="mt-1 text-xs text-red-500">{errors.current_amount?.message}</p>}
+              </div>
+            )}
           </div>
 
           {/* Target Date */}
@@ -488,33 +531,35 @@ export function SavingGoalsPage() {
              {savingsErrors.source_account_id?.message && <p className="mt-1 text-xs text-red-500">{savingsErrors.source_account_id?.message}</p>}
           </div>
 
-          {/* Expense Category */}
-          <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-              Expense Category
-            </label>
-            <div className="relative">
-              <select
-                {...registerSavings("category_id")}
-                className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
-                  savingsErrors.category_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
-                }`}
-              >
-                <option value="">Select category...</option>
-                {categories.filter(c => c.type === "Expense").map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
+          {/* Expense Category (Only for manual savings without associated account) */}
+          {!addingSavingsGoal?.account_id && (
+            <div>
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                Expense Category
+              </label>
+              <div className="relative">
+                <select
+                  {...registerSavings("category_id")}
+                  className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
+                    savingsErrors.category_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
+                  }`}
+                >
+                  <option value="">Select category...</option>
+                  {categories.filter(c => c.type === "Expense").map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
               </div>
+               {savingsErrors.category_id?.message && <p className="mt-1 text-xs text-red-500">{savingsErrors.category_id?.message}</p>}
             </div>
-             {savingsErrors.category_id?.message && <p className="mt-1 text-xs text-red-500">{savingsErrors.category_id?.message}</p>}
-          </div>
+          )}
 
           {/* Date */}
           <div>
