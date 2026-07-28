@@ -92,6 +92,7 @@ export function ReportsPage() {
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              data-testid="month-select"
               className="w-full appearance-none rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
             >
               {months.map((m) => (
@@ -110,6 +111,7 @@ export function ReportsPage() {
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(Number(e.target.value))}
+              data-testid="year-select"
               className="w-full appearance-none rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
             >
               {years.map((y) => (
@@ -127,6 +129,7 @@ export function ReportsPage() {
           <div className="flex gap-2 w-full sm:w-auto">
             <button
               onClick={() => handleExport("pdf")}
+              data-testid="export-pdf-button"
               className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 px-3.5 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 cursor-pointer"
             >
               <FileText className="h-4 w-4 text-red-650 dark:text-red-500" /> Export PDF

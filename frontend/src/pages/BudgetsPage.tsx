@@ -147,6 +147,7 @@ export function BudgetsPage() {
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              data-testid="month-select"
               className="w-full appearance-none rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
             >
               {months.map(m => (
@@ -165,6 +166,7 @@ export function BudgetsPage() {
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(Number(e.target.value))}
+              data-testid="year-select"
               className="w-full appearance-none rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
             >
               {years.map(y => (
@@ -290,6 +292,7 @@ export function BudgetsPage() {
                     <td className="p-4 text-center align-top">
                       <button
                         onClick={() => handleOpenEdit(cat.id, cat.name)}
+                        data-testid={`edit-budget-button-${cat.name.toLowerCase().replace(/\s+/g, '-')}`}
                         className="p-1.5 text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-md transition-colors inline-flex"
                       >
                         <Edit2 className="h-4 w-4" />
@@ -317,6 +320,7 @@ export function BudgetsPage() {
             <input
               type="number"
               {...register("planned_amount")}
+              data-testid="planned-amount-input"
               className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                 errors.planned_amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
               }`}
@@ -327,6 +331,7 @@ export function BudgetsPage() {
           <div className="pt-4 flex justify-end">
             <button
               type="submit"
+              data-testid="budget-submit-button"
               className="w-full sm:w-auto rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
             >
               Save Budget

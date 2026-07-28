@@ -70,6 +70,7 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, 
             <button
               key={t}
               type="button"
+              data-testid={`transaction-type-${t.toLowerCase()}-button`}
               onClick={() => setValue("type", t, { shouldValidate: true })}
               className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-all ${
                 selectedType === t
@@ -92,6 +93,7 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, 
         <input
           type="text"
           {...register("description")}
+          data-testid="transaction-description-input"
           placeholder="e.g., Weekly groceries, Salary deposit"
           className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
             errors.description ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
@@ -112,6 +114,7 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, 
           <input
             type="number"
             {...register("amount")}
+            data-testid="transaction-amount-input"
             placeholder="0"
             className={`w-full rounded-lg border bg-white dark:bg-zinc-900 pl-9 pr-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
               errors.amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
@@ -129,6 +132,7 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, 
         <input
           type="date"
           {...register("date")}
+          data-testid="transaction-date-input"
           className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
             errors.date ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
           }`}
@@ -145,6 +149,7 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, 
           <div className="relative">
             <select
               {...register("source_account_id")}
+              data-testid="transaction-source-account-select"
               className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                 errors.source_account_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
               }`}
@@ -175,6 +180,7 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, 
           <div className="relative">
             <select
               {...register("destination_account_id")}
+              data-testid="transaction-destination-account-select"
               className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                 errors.destination_account_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
               }`}
@@ -205,6 +211,7 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, 
           <div className="relative">
             <select
               {...register("category_id")}
+              data-testid="transaction-category-select"
               className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                 errors.category_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
               }`}
@@ -233,6 +240,7 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, 
         </label>
         <textarea
           {...register("notes")}
+          data-testid="transaction-notes-textarea"
           placeholder="Add extra details..."
           rows={3}
           className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
@@ -244,6 +252,7 @@ export function TransactionForm({ accounts, categories, onSubmit, isSubmitting, 
         <button
           type="submit"
           disabled={isSubmitting}
+          data-testid="transaction-submit-button"
           className="w-full sm:w-auto rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
         >
           {isSubmitting ? "Logging..." : "Log Transaction"}

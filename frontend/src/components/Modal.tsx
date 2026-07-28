@@ -41,13 +41,20 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       {/* Scrollable container element */}
       <div className="flex min-h-full items-center justify-center p-4">
         {/* Modal Content */}
-        <div className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 p-6 text-left align-middle shadow-xl transition-all border border-zinc-200 dark:border-zinc-800 my-8">
+        <div 
+          data-testid="modal-container"
+          className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 p-6 text-left align-middle shadow-xl transition-all border border-zinc-200 dark:border-zinc-800 my-8"
+        >
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-lg font-bold leading-6 text-zinc-900 dark:text-white">
+            <h3 
+              data-testid="modal-title"
+              className="text-lg font-bold leading-6 text-zinc-900 dark:text-white"
+            >
               {title}
             </h3>
             <button
               onClick={onClose}
+              data-testid="modal-close-button"
               className="rounded-full p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors"
             >
               <X className="h-5 w-5" />

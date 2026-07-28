@@ -65,6 +65,7 @@ export function AccountsPage() {
         </div>
         <button
           onClick={() => handleOpenModal()}
+          data-testid="add-account-button"
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
         >
           <Plus className="h-4 w-4" />
@@ -83,6 +84,7 @@ export function AccountsPage() {
           </p>
           <button
             onClick={() => handleOpenModal()}
+            data-testid="add-first-account-button"
             className="text-emerald-600 hover:text-emerald-700 font-medium text-sm"
           >
             + Add your first account
@@ -91,18 +93,30 @@ export function AccountsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {accounts.map(account => (
-            <div key={account.id} className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden">
+            <div 
+              key={account.id} 
+              data-testid={`account-card-${account.name.toLowerCase().replace(/\s+/g, '-')}`}
+              className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden"
+            >
               <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                <button onClick={() => handleOpenModal(account)} className="p-1.5 text-zinc-400 hover:text-emerald-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
+                <button 
+                  onClick={() => handleOpenModal(account)} 
+                  data-testid="edit-account-button"
+                  className="p-1.5 text-zinc-400 hover:text-emerald-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
+                >
                   <Edit2 className="h-4 w-4" />
                 </button>
-                <button onClick={() => handleDelete(account.id)} className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
+                <button 
+                  onClick={() => handleDelete(account.id)} 
+                  data-testid="delete-account-button"
+                  className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
+                >
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
               
               <div className="flex items-center gap-3 mb-4">
-                <div className="bg-emerald-50 dark:bg-emerald-500/10 p-2.5 rounded-lg text-emerald-600 dark:text-emerald-400">
+                <div className="bg-emerald-50 dark:bg-emerald-500/10 p-2.5 rounded-lg text-emerald-650 dark:text-emerald-400">
                   <Wallet className="h-5 w-5" />
                 </div>
                 <div>
@@ -115,7 +129,10 @@ export function AccountsPage() {
               
               <div>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">Current Balance</p>
-                <p className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                <p 
+                  data-testid={`account-balance-${account.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight"
+                >
                   {formatRupiah(account.balance)}
                 </p>
               </div>

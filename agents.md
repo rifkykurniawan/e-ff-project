@@ -237,6 +237,8 @@ Avoid unnecessary animations.
 
 Support desktop and mobile.
 
+Always include `data-testid` attributes on interactive elements (inputs, buttons, select boxes, dropdowns, forms) to support automated testing.
+
 ---
 
 # Authentication

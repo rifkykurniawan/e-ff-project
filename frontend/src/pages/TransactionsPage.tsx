@@ -107,6 +107,7 @@ export function TransactionsPage() {
         </div>
         <button
           onClick={handleOpenAddModal}
+          data-testid="add-transaction-button"
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
         >
           <Plus className="h-4 w-4" />
@@ -128,6 +129,7 @@ export function TransactionsPage() {
               <select
                 value={filters.accountId}
                 onChange={(e) => handleFilterChange("accountId", e.target.value)}
+                data-testid="filter-account-select"
                 className="w-full appearance-none rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-1.5 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               >
                 <option value="">All Accounts</option>
@@ -150,6 +152,7 @@ export function TransactionsPage() {
               <select
                 value={filters.categoryId}
                 onChange={(e) => handleFilterChange("categoryId", e.target.value)}
+                data-testid="filter-category-select"
                 className="w-full appearance-none rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-1.5 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               >
                 <option value="">All Categories</option>
@@ -172,6 +175,7 @@ export function TransactionsPage() {
               <select
                 value={filters.type}
                 onChange={(e) => handleFilterChange("type", e.target.value)}
+                data-testid="filter-type-select"
                 className="w-full appearance-none rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-1.5 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               >
                 <option value="">All Types</option>
@@ -194,6 +198,7 @@ export function TransactionsPage() {
               type="date"
               value={filters.startDate}
               onChange={(e) => handleFilterChange("startDate", e.target.value)}
+              data-testid="filter-start-date-input"
               className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
             />
           </div>
@@ -205,6 +210,7 @@ export function TransactionsPage() {
               type="date"
               value={filters.endDate}
               onChange={(e) => handleFilterChange("endDate", e.target.value)}
+              data-testid="filter-end-date-input"
               className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-1.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
             />
           </div>
@@ -214,6 +220,7 @@ export function TransactionsPage() {
           <div className="mt-4 flex justify-end">
             <button
               onClick={handleClearFilters}
+              data-testid="clear-filters-button"
               className="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
             >
               Clear Filters
@@ -307,12 +314,14 @@ export function TransactionsPage() {
                       <td className="p-4 text-center">
                         <button
                           onClick={() => handleOpenEditModal(t)}
+                          data-testid="edit-transaction-button"
                           className="p-1.5 text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-md transition-colors inline-flex mr-1.5"
                         >
                           <Edit2 className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(t.id)}
+                          data-testid="delete-transaction-button"
                           className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors inline-flex"
                         >
                           <Trash2 className="h-4 w-4" />

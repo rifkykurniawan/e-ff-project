@@ -216,6 +216,7 @@ export function SavingGoalsPage() {
         </div>
         <button
           onClick={handleOpenAddModal}
+          data-testid="add-goal-button"
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
         >
           <Plus className="h-4 w-4" />
@@ -308,6 +309,7 @@ export function SavingGoalsPage() {
                     <button
                       onClick={() => handleOpenAddSavings(goal)}
                       disabled={isCompleted}
+                      data-testid="add-savings-button"
                       className="flex-1 mr-2 flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
                     >
                       <PiggyBank className="h-3.5 w-3.5" />
@@ -315,6 +317,7 @@ export function SavingGoalsPage() {
                     </button>
                     <button
                       onClick={() => handleOpenEditModal(goal)}
+                      data-testid="edit-goal-button"
                       className="p-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-lg transition-all cursor-pointer"
                       title="Edit Goal"
                     >
@@ -322,6 +325,7 @@ export function SavingGoalsPage() {
                     </button>
                     <button
                       onClick={() => handleDelete(goal.id)}
+                      data-testid="delete-goal-button"
                       className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all cursor-pointer"
                       title="Delete Goal"
                     >

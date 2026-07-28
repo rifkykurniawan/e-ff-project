@@ -73,17 +73,23 @@ export function CategoriesPage() {
       ) : (
         <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {list.map(category => (
-            <li key={category.id} className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group">
+            <li 
+              key={category.id} 
+              data-testid={`category-item-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
+              className="flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors group"
+            >
               <span className="font-medium text-zinc-900 dark:text-white">{category.name}</span>
               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
                   onClick={() => handleOpenModal(category)}
+                  data-testid="edit-category-button"
                   className="p-2 text-zinc-400 hover:text-emerald-600 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-md transition-colors"
                 >
                   <Edit2 className="h-4 w-4" />
                 </button>
                 <button 
                   onClick={() => handleDelete(category.id)}
+                  data-testid="delete-category-button"
                   className="p-2 text-zinc-400 hover:text-red-600 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-md transition-colors"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -105,6 +111,7 @@ export function CategoriesPage() {
         </div>
         <button
           onClick={() => handleOpenModal()}
+          data-testid="add-category-button"
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
         >
           <Plus className="h-4 w-4" />
