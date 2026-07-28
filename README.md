@@ -1,8 +1,8 @@
-# Family Finance
+# E-Finance
 
-Family Finance is a modern, personal finance management web application designed for a single family to track income, expenses, budgets, and saving goals with complete user data isolation (one account manages one dataset).
+E-Finance is a modern, personal finance management web application designed for a single family to track income, expenses, budgets, and saving goals with complete user data isolation (one account manages one dataset).
 
-![Family Finance Dashboard](docs/ss.jpg)
+![E-Finance Dashboard](docs/ss.jpg)
 
 ---
 
