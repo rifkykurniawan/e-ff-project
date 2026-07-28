@@ -32,6 +32,10 @@ E-FF/
 │   │   ├── types/            # TypeScript definitions
 │   │   └── utils/            # Helper functions
 │   └── package.json
+├── tests-e2e/                # Playwright E2E automation testing suite
+│   ├── pages/                # Page Object Models (POM)
+│   ├── tests/                # Playwright spec files
+│   └── playwright.config.ts  # Playwright runner configuration
 ├── docs/                     # Technical specifications docs
 │   ├── requirements.md       # Software Requirement Specification
 │   ├── database.md           # Database Design
@@ -75,3 +79,32 @@ Before running the application, make sure to execute the SQL DDL statements loca
    npm run dev
    ```
    The frontend application will be active at http://localhost:5173.
+
+### 5. Running E2E Tests
+End-to-End tests are located in the [tests-e2e](file:///Users/rifkykurniawan/Documents/WORK%21%21/Project/E-FF/tests-e2e) directory and are built using **Playwright**.
+
+1. Navigate to the `tests-e2e` directory:
+   ```bash
+   cd tests-e2e
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Install Playwright browsers:
+   ```bash
+   npx playwright install chromium
+   ```
+4. Run tests:
+   - Run tests in headless mode:
+     ```bash
+     npm run test
+     ```
+   - Open Interactive UI Mode (debugging):
+     ```bash
+     npm run test:ui
+     ```
+   - Launch Playwright inspector to debug:
+     ```bash
+     npm run test:debug
+     ```
