@@ -1,5 +1,7 @@
 export interface DashboardSavingGoal {
   name: string;
+  current_amount: number;
+  target_amount: number;
   progress_percentage: number;
 }
 

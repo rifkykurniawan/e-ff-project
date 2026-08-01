@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useDashboard } from "../hooks/useDashboard";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, Link } from "react-router-dom";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
 import { useTransactions } from "../hooks/useTransactions";
@@ -462,19 +462,63 @@ export const DashboardPage: React.FC = () => {
             {/* Saving Goals Summary Card */}
             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-sm space-y-4 transition-colors duration-200">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-zinc-900 dark:text-white">
-                  <Target className="h-5 w-5 text-emerald-600 dark:text-emerald-500" />
+                <Link 
+                  to="/saving-goals" 
+                  className="flex items-center gap-2 text-zinc-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group"
+                  data-testid="dashboard-saving-goals-link"
+                >
+                  <Target className="h-5 w-5 text-emerald-600 dark:text-emerald-500 group-hover:scale-110 transition-transform" />
                   <h2 className="text-lg font-bold tracking-tight">Saving Goals</h2>
-                </div>
-                <span className="bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-750 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  Soon
-                </span>
+                </Link>
+                <Link
+                  to="/saving-goals"
+                  className="text-xs text-emerald-600 dark:text-emerald-450 hover:underline font-semibold"
+                  data-testid="dashboard-view-all-goals-link"
+                >
+                  View All
+                </Link>
               </div>
 
-              <div className="flex flex-col items-center justify-center text-center p-5 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950/20">
-                <Activity className="h-7 w-7 text-zinc-400 mb-2 animate-pulse" />
-                <p className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Feature Coming Soon</p>
-                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 max-w-[200px]">We are fine-tuning saving goal allocations.</p>
+              <div className="space-y-4">
+                {dashboardData.saving_goals.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center text-center p-5 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/50 dark:bg-zinc-950/20">
+                    <Target className="h-7 w-7 text-zinc-400 mb-2" />
+                    <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">No saving goals configured</p>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 mb-4 max-w-[200px]">Start planning for your future goals today.</p>
+                    <Link
+                      to="/saving-goals"
+                      className="inline-flex items-center justify-center rounded-xl bg-emerald-600 hover:bg-emerald-500 px-4 py-2 text-xs font-semibold text-white transition-all shadow-md shadow-emerald-950/10 active:scale-95 cursor-pointer"
+                      data-testid="dashboard-create-goal-cta"
+                    >
+                      Manage Goals
+                    </Link>
+                  </div>
+                ) : (
+                  dashboardData.saving_goals.map((goal, idx) => {
+                    const percent = goal.progress_percentage;
+                    return (
+                      <div key={idx} className="space-y-2">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="font-medium text-zinc-800 dark:text-zinc-200">{goal.name}</span>
+                          <span className="text-zinc-500 dark:text-zinc-400 font-semibold">{percent}%</span>
+                        </div>
+                        {/* Progress Bar Container */}
+                        <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden transition-colors duration-200">
+                          <div
+                            className="h-full rounded-full transition-all duration-500 bg-emerald-500"
+                            style={{ width: `${percent}%` }}
+                          ></div>
+                        </div>
+                        <div className="flex justify-between items-center text-xs text-zinc-450 dark:text-zinc-500">
+                          <span>
+                            {formatAmount(goal.current_amount)}{" "}
+                            <span className="text-zinc-400 dark:text-zinc-650">/ {formatAmount(goal.target_amount)}</span>
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
 

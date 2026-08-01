@@ -53,6 +53,8 @@ export const reportsService = {
       // 4. Saving Goals Progress
       const saving_goals: DashboardSavingGoal[] = savingGoals.map((goal) => ({
         name: goal.name,
+        current_amount: Number(goal.current_amount),
+        target_amount: Number(goal.target_amount),
         progress_percentage: goal.target_amount > 0 
           ? Math.min(Math.round((Number(goal.current_amount) / Number(goal.target_amount)) * 100), 100)
           : 0
