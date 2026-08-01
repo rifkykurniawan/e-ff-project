@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { qase } from "playwright-qase-reporter/playwright";
 import { LoginPage } from "../pages/LoginPage";
 import { DashboardPage } from "../pages/DashboardPage";
 
@@ -10,13 +11,13 @@ test.describe("Authentication E2E Tests", () => {
     await loginPage.goto();
   });
 
-  test("should load the login page with all expected elements", async () => {
+  test(qase(1, "should load the login page with all expected elements"), async () => {
     await expect(loginPage.emailInput).toBeVisible();
     await expect(loginPage.passwordInput).toBeVisible();
     await expect(loginPage.submitButton).toBeVisible();
   });
 
-  test("should display validation errors when fields are empty", async ({ page }) => {
+  test(qase(2, "should display validation errors when fields are empty"), async ({ page }) => {
     await loginPage.submitButton.click();
     
     // Check if error messages are visible in form validation
@@ -25,7 +26,7 @@ test.describe("Authentication E2E Tests", () => {
     await expect(emailError.or(passwordError).first()).toBeVisible();
   });
 
-  test("should fail login with incorrect credentials", async () => {
+  test(qase(3, "should fail login with incorrect credentials"), async () => {
     await loginPage.login("wrong@family.com", "wrongpassword123");
     
     // Should display error alert containing bad credentials details

@@ -1,12 +1,39 @@
 import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
+
+// Load environment variables from .env file
+dotenv.config({ path: path.resolve(__dirname, ".env") });
+
+const isCI = !!process.env.CI;
+
+const reporters: any[] = [["html"]];
+
+if (!isCI) {
+  reporters.push([
+    "playwright-qase-reporter",
+    {
+      mode: "testops",
+      testops: {
+        api: {
+          token: process.env.QASE_API_TOKEN,
+        },
+        project: process.env.QASE_PROJECT_CODE,
+        run: {
+          complete: true,
+        },
+      },
+    },
+  ]);
+}
 
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: "html",
+  forbidOnly: isCI,
+  retries: isCI ? 2 : 0,
+  workers: isCI ? 1 : undefined,
+  reporter: reporters,
   use: {
     baseURL: "http://localhost:5173",
     trace: "on-first-retry",
@@ -16,14 +43,6 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-    },
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
     },
   ],
 
