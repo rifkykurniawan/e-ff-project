@@ -1,4 +1,4 @@
-# Test Cases - Family Finance
+# Test Cases - E-Finance
 
 This document provides detailed, step-by-step test cases corresponding to each milestone defined in the [test_plan.md](file:///Users/rifkykurniawan/Documents/WORK%21%21/Project/E-FF/docs/test_plan.md).
 
