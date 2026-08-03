@@ -58,8 +58,10 @@ Each registered user has complete data isolation—meaning 1 account corresponds
 
 ### 3.6. Saving Goals
 - **Goal Creation**: Users can create an unlimited number of saving goals.
-- **Goal Fields**: Name, Target Amount, Current Amount, Target Date (optional), and Notes (optional).
-- **Savings Logic**: Saving goals do not directly affect account balances. To fund a goal, the family must transfer money into an account marked as a `Savings` type. Progress of the saving goal is calculated automatically from the goal's target and current amounts.
+- **Goal Fields**: Name, Target Amount, Current Amount, Target Date (optional), Notes (optional), and Account Link (optional, maps to an account ID).
+- **Savings Logic**: Saving goals can be optionally linked to a specific account:
+  - **Linked Goals**: The progress/current amount is dynamically derived from the balance of the linked account. To contribute to the goal, money is transferred into the linked account (using a Transfer transaction).
+  - **Manual/Unlinked Goals**: The goal maintains its own static `current_amount`. To contribute, the user logs a savings contribution which directly increments the goal's current amount and logs a corresponding Expense transaction from the source account.
 
 ### 3.7. Dashboard
 - **Total Balance**: Aggregated balance of all active accounts (excluding/including specific types, or a simple total).
@@ -144,17 +146,20 @@ sequenceDiagram
     actor User
     participant Frontend as React App (Supabase SDK)
     participant DB as Supabase Database
-    User->>Frontend: Navigate to Saving Goals, Click "New Goal"
-    Frontend->>DB: INSERT INTO saving_goals (Auth Header)
-    Note over DB: Check RLS policy & Schema rules
-    DB-->>Frontend: JSON Response { data: [...], error: null }
+    User->>Frontend: Navigate to Saving Goals, Click "New Goal" / "Add Savings"
+    alt If Linked to Account
+        Frontend->>DB: INSERT INTO transactions (type='Transfer', dest=linked_account_id)
+    else If Manual / Unlinked
+        Frontend->>DB: UPDATE saving_goals (increment current_amount) & INSERT INTO transactions (type='Expense')
+    end
+    DB-->>Frontend: Success Response
     Frontend->>Frontend: Update goals list and progress metrics
 ```
 
 ---
 
 ## 6. Business Rules
-1. **Single-Family Domain**: All registered users are part of the same family and share access to all accounts, categories, budgets, and transactions.
+1. **User Workspace Isolation**: Each registered user has their own completely isolated workspace (accounts, transactions, categories, budgets, and saving goals). There is no sharing of financial data between users. Row Level Security (RLS) policies enforce this isolation at the database level.
 2. **Transaction Balance Impact**:
    - **Income**: Account Balance = Current Balance + Transaction Amount.
    - **Expense**: Account Balance = Current Balance - Transaction Amount.
@@ -210,6 +215,8 @@ sequenceDiagram
 - **AC 9**: Remaining budget column must display a negative value and be visually highlighted (e.g., colored red) if the actual expense exceeds the planned budget.
 
 ### 10.6. Saving Goals
-- **AC 10**: The saving goal progress bar must accurately display the percentage of `Current Amount / Target Amount`.
-- **AC 11**: Editing a saving goal's current amount must update the calculated progress immediately.
+- **AC 10**: The saving goal progress bar must accurately display the percentage of `Current Amount / Target Amount`. If the goal is linked to an account, the current amount is dynamically retrieved from the linked account's balance.
+- **AC 11**: Adding savings to a goal:
+  - For goals linked to an account, a Transfer transaction must be created, and the balance of the linked account increases (updating the goal progress).
+  - For goals not linked to an account, the goal's `current_amount` is directly updated, and an Expense transaction must be logged.
 
