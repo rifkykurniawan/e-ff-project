@@ -41,7 +41,10 @@ E-FF/
 │   ├── database.md           # Database Design
 │   ├── ui-guideline.md       # Visual Guidelines
 │   ├── roadmap.md            # Development Milestones
-│   └── migration_signup.sql  # Database migration for user signup & RLS
+│   ├── migration_signup.sql  # Database migration for user signup & RLS
+│   ├── migration_saving_goals_account.sql # Database migration for linking saving goals to accounts
+│   ├── test_plan.md          # Project Test Plan by Milestones
+│   └── test_cases.md         # Detailed step-by-step Test Cases
 ├── .env.example              # Development environment variables template
 └── README.md                 # Project Overview (This file)
 ```
