@@ -1,4 +1,4 @@
-# Test Plan - Family Finance
+# Test Plan - E Finance
 
 This document outlines the testing strategy structured around the project's development milestones as detailed in [roadmap.md](file:///Users/rifkykurniawan/Documents/WORK%21%21/Project/E-FF/docs/roadmap.md). Testing ensures that all functional, database, and security requirements defined in [requirements.md](file:///Users/rifkykurniawan/Documents/WORK%21%21/Project/E-FF/docs/requirements.md) are met.
 
