@@ -120,7 +120,7 @@ export const LoginPage: React.FC = () => {
                 </div>
               )}
 
-              <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+              <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
                 <div>
                   <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-zinc-550 dark:text-zinc-400 mb-1.5">
                     Email Address
