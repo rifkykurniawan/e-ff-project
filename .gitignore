@@ -31,3 +31,9 @@ dist-ssr/
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Playwright Test Artifacts
+playwright-report/
+test-results/
+blob-report/
+

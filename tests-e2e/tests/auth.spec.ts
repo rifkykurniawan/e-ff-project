@@ -11,7 +11,7 @@ test.describe("Authentication E2E Tests", () => {
     await loginPage.goto();
   });
 
-  test(qase(1, "should load the login page with all expected elements"), async () => {
+  test(qase(1, "TC-001-AUTH-Should load the login page with all expected elements"), async () => {
     await test.step("Verify that all expected input elements are visible on the login page", async () => {
       await expect(loginPage.emailInput).toBeVisible();
       await expect(loginPage.passwordInput).toBeVisible();
@@ -19,7 +19,7 @@ test.describe("Authentication E2E Tests", () => {
     });
   });
 
-  test(qase(2, "should display validation errors when fields are empty"), async ({ page }) => {
+  test(qase(2, "TC-002-AUTH-Should display validation errors when fields are empty"), async ({ page }) => {
     await test.step("Click submit button without filling fields", async () => {
       await loginPage.submitButton.click();
     });
@@ -32,7 +32,7 @@ test.describe("Authentication E2E Tests", () => {
     });
   });
 
-  test(qase(3, "should fail login with incorrect credentials"), async () => {
+  test(qase(3, "TC-003-AUTH-Should fail login with incorrect credentials"), async () => {
     await test.step("Attempt to log in with incorrect credentials", async () => {
       await loginPage.login("wrong@family.com", "wrongpassword123");
     });
