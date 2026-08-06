@@ -1,6 +1,6 @@
 # AGENTS.md
 
-# Family Finance
+# E- Finance
 
 ## Project Overview
 

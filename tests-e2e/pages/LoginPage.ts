@@ -23,6 +23,7 @@ export class LoginPage {
     this.passwordValidationError = page.locator("text=Password must be at least 8 characters");
   }
 
+
   async goto() {
     await this.page.goto("/login");
   }
