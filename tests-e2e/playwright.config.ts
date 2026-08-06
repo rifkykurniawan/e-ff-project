@@ -9,7 +9,7 @@ const isCI = !!process.env.CI;
 
 const reporters: any[] = [["html"]];
 
-if (!isCI) {
+if (process.env.QASE_API_TOKEN) {
   reporters.push([
     "playwright-qase-reporter",
     {

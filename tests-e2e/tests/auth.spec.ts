@@ -19,16 +19,13 @@ test.describe("Authentication E2E Tests", () => {
     });
   });
 
-  test(qase(2, "TC-002-AUTH-Should display validation errors when fields are empty"), async ({ page }) => {
+  test(qase(2, "TC-002-AUTH-Should display validation errors when fields are empty"), async () => {
     await test.step("Click submit button without filling fields", async () => {
       await loginPage.submitButton.click();
     });
     
     await test.step("Verify validation errors are displayed", async () => {
-      // Check if error messages are visible in form validation
-      const emailError = page.locator("text=Please enter a valid email address");
-      const passwordError = page.locator("text=Password must be at least 8 characters");
-      await expect(emailError.or(passwordError).first()).toBeVisible();
+      await expect(loginPage.emailValidationError.or(loginPage.passwordValidationError).first()).toBeVisible();
     });
   });
 
@@ -38,8 +35,39 @@ test.describe("Authentication E2E Tests", () => {
     });
     
     await test.step("Verify error alert is displayed", async () => {
-      // Should display error alert containing bad credentials details
       await expect(loginPage.errorAlert.first()).toBeVisible();
+    });
+  });
+
+  test(qase(4, "TC-004-AUTH-Should display validation error for invalid email format"), async () => {
+    await test.step("Enter invalid email format and click submit", async () => {
+      await loginPage.emailInput.fill("invalid-email-format");
+      await loginPage.passwordInput.fill("password123");
+      await loginPage.submitButton.click();
+    });
+
+    await test.step("Verify invalid email format error message is displayed", async () => {
+      await expect(loginPage.emailValidationError).toBeVisible();
+    });
+  });
+
+  test(qase(5, "TC-005-AUTH-Should navigate to sign up page when clicking sign up link"), async ({ page }) => {
+    await test.step("Click Sign Up link on login card", async () => {
+      await loginPage.clickSignUpLink();
+    });
+
+    await test.step("Verify user is redirected to the sign up page", async () => {
+      await expect(page).toHaveURL(/\/signup/);
+    });
+  });
+
+  test(qase(6, "TC-006-AUTH-Should toggle theme between light and dark mode"), async () => {
+    await test.step("Click theme toggle button", async () => {
+      await loginPage.toggleTheme();
+    });
+
+    await test.step("Verify theme toggle button state changed", async () => {
+      await expect(loginPage.themeToggleButton).toBeVisible();
     });
   });
 });
