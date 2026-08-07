@@ -1,9 +1,11 @@
 name: Playwright E2E Tests
 on:
   push:
-    branches: [ main, master ]
+    branches: [ dev, main, master, "test/**", "feat/**", "fix/**" ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ dev, main, master, "test/**", "feat/**", "fix/**" ]
+  workflow_dispatch:
+
 jobs:
   test:
     timeout-minutes: 60
