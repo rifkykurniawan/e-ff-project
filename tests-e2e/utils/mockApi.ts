@@ -380,3 +380,275 @@ export async function setupTransactionsApiMocks(
   });
 }
 
+export async function setupBudgetsApiMocks(
+  page: Page,
+  initialData?: {
+    categories?: any[];
+    budgets?: any[];
+    transactions?: any[];
+  }
+) {
+  let currentCategories = [...(initialData?.categories || [])];
+  let currentBudgets = [...(initialData?.budgets || [])];
+  let currentTransactions = [...(initialData?.transactions || [])];
+
+  await page.route("**/auth/v1/token*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        access_token: "mock-access-token",
+        token_type: "bearer",
+        expires_in: 3600,
+        refresh_token: "mock-refresh-token",
+        user: { id: "mock-user-id", email: "test@family.com", email_confirmed_at: new Date().toISOString() },
+      }),
+    });
+  });
+
+  await page.route("**/auth/v1/user*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ id: "mock-user-id", email: "test@family.com", email_confirmed_at: new Date().toISOString() }),
+    });
+  });
+
+  await page.route("**/rest/v1/users*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ first_name: "Test", last_name: "User", is_verified: true }),
+    });
+  });
+
+  await page.route("**/rest/v1/categories*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(currentCategories),
+    });
+  });
+
+  await page.route("**/rest/v1/transactions*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(currentTransactions),
+    });
+  });
+
+  await page.route("**/rest/v1/budgets*", async (route) => {
+    const method = route.request().method();
+    if (method === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(currentBudgets),
+      });
+    } else if (method === "POST") {
+      const postData = route.request().postDataJSON();
+      const payload = Array.isArray(postData) ? postData[0] : postData;
+      const newBudget = {
+        id: `mock-budget-id-${currentBudgets.length + 1}`,
+        category_id: payload.category_id,
+        year: Number(payload.year),
+        month: Number(payload.month),
+        planned_amount: Number(payload.planned_amount),
+        created_at: new Date().toISOString(),
+      };
+      currentBudgets.push(newBudget);
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify(Array.isArray(postData) ? [newBudget] : newBudget),
+      });
+    } else if (method === "PATCH" || method === "PUT") {
+      const postData = route.request().postDataJSON();
+      const url = route.request().url();
+      const match = url.match(/id=eq\.([^&]+)/);
+      if (match && currentBudgets.length > 0) {
+        const updateId = match[1];
+        const index = currentBudgets.findIndex(b => b.id === updateId);
+        if (index !== -1) {
+          currentBudgets[index] = { ...currentBudgets[index], ...postData };
+        }
+      } else if (currentBudgets.length > 0) {
+        currentBudgets[0] = { ...currentBudgets[0], ...postData };
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(currentBudgets[0] || {}),
+      });
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+export async function setupSavingGoalsApiMocks(
+  page: Page,
+  initialData?: {
+    accounts?: any[];
+    categories?: any[];
+    savingGoals?: any[];
+    transactions?: any[];
+  }
+) {
+  let currentAccounts = [...(initialData?.accounts || [])];
+  let currentCategories = [...(initialData?.categories || [])];
+  let currentGoals = [...(initialData?.savingGoals || [])];
+  let currentTransactions = [...(initialData?.transactions || [])];
+
+  await page.route("**/auth/v1/token*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        access_token: "mock-access-token",
+        token_type: "bearer",
+        expires_in: 3600,
+        refresh_token: "mock-refresh-token",
+        user: { id: "mock-user-id", email: "test@family.com", email_confirmed_at: new Date().toISOString() },
+      }),
+    });
+  });
+
+  await page.route("**/auth/v1/user*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ id: "mock-user-id", email: "test@family.com", email_confirmed_at: new Date().toISOString() }),
+    });
+  });
+
+  await page.route("**/rest/v1/users*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ first_name: "Test", last_name: "User", is_verified: true }),
+    });
+  });
+
+  await page.route("**/rest/v1/accounts*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(currentAccounts),
+    });
+  });
+
+  await page.route("**/rest/v1/categories*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(currentCategories),
+    });
+  });
+
+  await page.route("**/rest/v1/transactions*", async (route) => {
+    const method = route.request().method();
+    if (method === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(currentTransactions),
+      });
+    } else if (method === "POST") {
+      const postData = route.request().postDataJSON();
+      const payload = Array.isArray(postData) ? postData[0] : postData;
+      const newTx = {
+        id: `mock-tx-id-${currentTransactions.length + 1}`,
+        description: payload.description,
+        amount: Number(payload.amount),
+        type: payload.type,
+        date: payload.date,
+        source_account_id: payload.source_account_id || null,
+        destination_account_id: payload.destination_account_id || null,
+        category_id: payload.category_id || null,
+        notes: payload.notes || null,
+        created_at: new Date().toISOString(),
+      };
+      currentTransactions.push(newTx);
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify(Array.isArray(postData) ? [newTx] : newTx),
+      });
+    } else {
+      await route.continue();
+    }
+  });
+
+  await page.route("**/rest/v1/saving_goals*", async (route) => {
+    const method = route.request().method();
+    if (method === "GET") {
+      const response = currentGoals.map(g => ({
+        ...g,
+        accounts: currentAccounts.find(a => a.id === g.account_id) || null
+      }));
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(response),
+      });
+    } else if (method === "POST") {
+      const postData = route.request().postDataJSON();
+      const payload = Array.isArray(postData) ? postData[0] : postData;
+      const newGoal = {
+        id: `mock-goal-id-${currentGoals.length + 1}`,
+        name: payload.name,
+        target_amount: Number(payload.target_amount),
+        current_amount: Number(payload.current_amount || 0),
+        target_date: payload.target_date || null,
+        notes: payload.notes || null,
+        account_id: payload.account_id || null,
+        created_at: new Date().toISOString(),
+        accounts: currentAccounts.find(a => a.id === payload.account_id) || null,
+      };
+      currentGoals.push(newGoal);
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify(Array.isArray(postData) ? [newGoal] : newGoal),
+      });
+    } else if (method === "PATCH" || method === "PUT") {
+      const postData = route.request().postDataJSON();
+      const url = route.request().url();
+      const match = url.match(/id=eq\.([^&]+)/);
+      if (match && currentGoals.length > 0) {
+        const updateId = match[1];
+        const index = currentGoals.findIndex(g => g.id === updateId);
+        if (index !== -1) {
+          currentGoals[index] = { ...currentGoals[index], ...postData };
+        }
+      } else if (currentGoals.length > 0) {
+        currentGoals[0] = { ...currentGoals[0], ...postData };
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(currentGoals[0] || {}),
+      });
+    } else if (method === "DELETE") {
+      const url = route.request().url();
+      const match = url.match(/id=eq\.([^&]+)/);
+      if (match) {
+        const deleteId = match[1];
+        currentGoals = currentGoals.filter(g => g.id !== deleteId);
+      } else {
+        currentGoals.pop();
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({}),
+      });
+    } else {
+      await route.continue();
+    }
+  });
+}
+
+

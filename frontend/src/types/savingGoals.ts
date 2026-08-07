@@ -22,7 +22,7 @@ export const savingGoalSchema = z.object({
   current_amount: z.coerce.number().nonnegative("Current amount must be 0 or greater"),
   target_date: z.preprocess((val) => (val === "" ? null : val), z.string().nullable().optional()),
   notes: z.string().nullable().optional(),
-  account_id: z.string().uuid("Please select a valid account").nullable().optional(),
+  account_id: z.preprocess((val) => (val === "" ? null : val), z.string().uuid("Please select a valid account").nullable().optional()),
 }).refine((data) => {
   if (data.account_id) return true;
   return data.current_amount <= data.target_amount;
