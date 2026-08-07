@@ -252,6 +252,7 @@ export function SavingGoalsPage() {
             return (
               <div 
                 key={goal.id} 
+                data-testid={`goal-card-${goal.name.toLowerCase().replace(/\s+/g, '-')}`}
                 className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 flex flex-col justify-between shadow-sm relative overflow-hidden group"
               >
                 {/* Completion Badge Overlay */}
@@ -354,6 +355,7 @@ export function SavingGoalsPage() {
             <input
               type="text"
               {...register("name")}
+              data-testid="goal-name-input"
               placeholder="e.g., Vacation fund, Downpayment"
               className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                 errors.name ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
@@ -370,6 +372,7 @@ export function SavingGoalsPage() {
             <div className="relative">
               <select
                 {...register("account_id")}
+                data-testid="goal-account-select"
                 className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                   errors.account_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
                 }`}
@@ -399,6 +402,7 @@ export function SavingGoalsPage() {
               <input
                 type="number"
                 {...register("target_amount")}
+                data-testid="goal-target-amount-input"
                 placeholder="0"
                 className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                   errors.target_amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
@@ -416,6 +420,7 @@ export function SavingGoalsPage() {
                 <input
                   type="number"
                   {...register("current_amount")}
+                  data-testid="goal-current-amount-input"
                   placeholder="0"
                   className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                     errors.current_amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
@@ -434,6 +439,7 @@ export function SavingGoalsPage() {
             <input
               type="date"
               {...register("target_date")}
+              data-testid="goal-target-date-input"
               className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                 errors.target_date ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
               }`}
@@ -448,6 +454,7 @@ export function SavingGoalsPage() {
             </label>
             <textarea
               {...register("notes")}
+              data-testid="goal-notes-textarea"
               placeholder="Provide context or details about this saving goal..."
               rows={3}
               className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
@@ -458,6 +465,7 @@ export function SavingGoalsPage() {
           <div className="pt-4 flex justify-end">
             <button
               type="submit"
+              data-testid="goal-submit-button"
               className="w-full sm:w-auto rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
             >
               {editingGoal ? "Save Goal" : "Create Goal"}
@@ -499,6 +507,7 @@ export function SavingGoalsPage() {
             <input
               type="number"
               {...registerSavings("amount")}
+              data-testid="savings-amount-input"
               placeholder="e.g., 500000"
               className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                 savingsErrors.amount ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
@@ -515,6 +524,7 @@ export function SavingGoalsPage() {
             <div className="relative">
               <select
                 {...registerSavings("source_account_id")}
+                data-testid="savings-source-account-select"
                 className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                   savingsErrors.source_account_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
                 }`}
@@ -544,6 +554,7 @@ export function SavingGoalsPage() {
               <div className="relative">
                 <select
                   {...registerSavings("category_id")}
+                  data-testid="savings-category-select"
                   className={`w-full appearance-none rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                     savingsErrors.category_id ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
                   }`}
@@ -573,6 +584,7 @@ export function SavingGoalsPage() {
             <input
               type="date"
               {...registerSavings("date")}
+              data-testid="savings-date-input"
               className={`w-full rounded-lg border bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 ${
                 savingsErrors.date ? "border-red-500 focus:border-red-500" : "border-zinc-300 dark:border-zinc-700 focus:border-emerald-500"
               }`}
@@ -585,6 +597,7 @@ export function SavingGoalsPage() {
             <button
               type="submit"
               disabled={isLoggingTransaction}
+              data-testid="savings-submit-button"
               className="w-full sm:w-auto rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors cursor-pointer"
             >
               {isLoggingTransaction ? "Adding Savings..." : "Confirm & Add"}
