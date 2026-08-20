@@ -30,12 +30,7 @@ export class ReportsPage {
   }
 
   getSummaryCardValue(label: "Total Income" | "Total Outcome" | "Net Cash Flow"): Locator {
-    // The structure has a container div containing a header label div and a value div
-    return this.page
-      .locator("div")
-      .filter({ has: this.page.locator(`text=/^${label}$/i`) })
-      .locator("div.text-xl, .text-xl")
-      .first();
+    return this.page.getByText(label, { exact: true }).locator("..").locator(".text-xl");
   }
 
   getCategoryBreakdownRow(categoryName: string): Locator {

@@ -25,12 +25,16 @@ test.describe("Reports Component and Calculation Validation (Milestone 3)", () =
     { id: UTILITIES_CATEGORY_ID, name: "Utilities", type: "Expense", created_at: new Date().toISOString() },
   ];
 
-  const testEmail = process.env.TEST_USER_EMAIL || "test@family.com";
-  const testPassword = process.env.TEST_USER_PASSWORD || "password123";
-
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     reportsPage = new ReportsPage(page);
+
+    // Setup default API mocks first so authentication endpoints are intercepted during login
+    await setupTransactionsApiMocks(page, {
+      accounts: mockAccounts,
+      categories: mockCategories,
+      transactions: [],
+    });
 
     const testEmail = process.env.TEST_USER_EMAIL || "test@family.com";
     const testPassword = process.env.TEST_USER_PASSWORD || "password123";
@@ -42,14 +46,6 @@ test.describe("Reports Component and Calculation Validation (Milestone 3)", () =
   });
 
   test(qase(21, "TC-001-RPT: Verify Empty State on Reports Page"), async ({ page }) => {
-    await test.step("Setup empty transactions mock", async () => {
-      await setupTransactionsApiMocks(page, {
-        accounts: mockAccounts,
-        categories: mockCategories,
-        transactions: [],
-      });
-    });
-
     await test.step("Navigate to the Reports page", async () => {
       await reportsPage.goto();
     });
@@ -109,11 +105,13 @@ test.describe("Reports Component and Calculation Validation (Milestone 3)", () =
       },
     ];
 
-    await test.step("Setup transactions mock for the current month", async () => {
-      await setupTransactionsApiMocks(page, {
-        accounts: mockAccounts,
-        categories: mockCategories,
-        transactions: mockTransactions,
+    await test.step("Setup custom transactions route for this test", async () => {
+      await page.route("**/rest/v1/transactions*", async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(mockTransactions),
+        });
       });
     });
 
@@ -122,7 +120,6 @@ test.describe("Reports Component and Calculation Validation (Milestone 3)", () =
     });
 
     await test.step("Verify summary card totals (Income = 5,000,000, Outcome = 2,000,000, Net = 3,000,000)", async () => {
-      // Formatted amounts use currency format e.g. Rp 5.000.000
       await expect(reportsPage.getSummaryCardValue("Total Income")).toContainText("Rp 5.000.000");
       await expect(reportsPage.getSummaryCardValue("Total Outcome")).toContainText("Rp 2.000.000");
       await expect(reportsPage.getSummaryCardValue("Net Cash Flow")).toContainText("Rp 3.000.000");
@@ -135,11 +132,11 @@ test.describe("Reports Component and Calculation Validation (Milestone 3)", () =
 
       const groceriesRow = reportsPage.getCategoryBreakdownRow("Groceries");
       await expect(groceriesRow).toContainText("Rp 1.200.000");
-      await expect(groceriesRow).toContainText("60%"); // 1,200,000 / 2,000,000 = 60%
+      await expect(groceriesRow).toContainText("60%");
 
       const utilitiesRow = reportsPage.getCategoryBreakdownRow("Utilities");
       await expect(utilitiesRow).toContainText("Rp 800.000");
-      await expect(utilitiesRow).toContainText("40%"); // 800,000 / 2,000,000 = 40%
+      await expect(utilitiesRow).toContainText("40%");
     });
 
     await test.step("Verify transactions tables", async () => {
@@ -159,20 +156,10 @@ test.describe("Reports Component and Calculation Validation (Milestone 3)", () =
     const now = new Date();
     const currentYear = now.getFullYear();
 
-    // Setup empty transactions initial state
-    await test.step("Setup initial API mocks", async () => {
-      await setupTransactionsApiMocks(page, {
-        accounts: mockAccounts,
-        categories: mockCategories,
-        transactions: [],
-      });
-    });
-
     await test.step("Navigate to the Reports page", async () => {
       await reportsPage.goto();
     });
 
-    // Mock changing month
     await test.step("Filter by different month/year and verify dropdown change", async () => {
       await reportsPage.selectMonth(3); // March
       await expect(reportsPage.monthSelect).toHaveValue("3");
@@ -183,14 +170,6 @@ test.describe("Reports Component and Calculation Validation (Milestone 3)", () =
   });
 
   test(qase(24, "TC-004-RPT: Verify Export Functionality warning alert"), async ({ page }) => {
-    await test.step("Setup empty transactions mock", async () => {
-      await setupTransactionsApiMocks(page, {
-        accounts: mockAccounts,
-        categories: mockCategories,
-        transactions: [],
-      });
-    });
-
     await test.step("Navigate to the Reports page", async () => {
       await reportsPage.goto();
     });
